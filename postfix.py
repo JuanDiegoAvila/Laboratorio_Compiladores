@@ -1,63 +1,98 @@
 
 class Postfix():
     def __init__(self, expresion):
-        self.expresion = self.concat_expression(expresion)
-        print(self.expresion)
         self.stack = []
         self.output = []
         self.operators = {
-            '(': 1,
-            ')': 1,
-            '*': 2,
-            '+': 2,
+            '*': 4,
+            '+': 4,
+            '?': 4,
             '.': 3,
-            '|': 4,
-            '#': 5,
+            '|': 2,
+            '#': 1,
+            '(': 1
         }
-        self.convert()
-        print(self.output)
+
+        self.binary_operators = '|.'
+        self.unary_operators = '*+?'
+
+        self.expresion = self.concat_expression(expresion)
+        self.output = self.convert()
+        self.final = ''.join(self.output)
+        self.final = self.final.replace('?', 'ε|')
 
     def concat_expression(self, expresion):
-        concat_expresion = ''
+        concat_expresion = ""
+        
         for i in range(len(expresion)):
+            char = expresion[i]
+            concat_expresion += char
+
             if i+1 < len(expresion):
-                if self.is_operand(expresion[i]) and self.is_operand(expresion[i+1]):
-                    concat_expresion += expresion[i] + '.'
-                elif self.is_operand(expresion[i]) and expresion[i+1] == '(':
-                    concat_expresion += expresion[i] + '.'
-                elif expresion[i] == ')' and self.is_operand(expresion[i+1]):
-                    concat_expresion += expresion[i] + '.'
-                elif expresion[i] == ')' and expresion[i+1] == '(':
-                    concat_expresion += expresion[i] + '.'
-                else:
-                    concat_expresion += expresion[i]
-            else:
-                concat_expresion += expresion[i]
-                concat_expresion += '.'
-                concat_expresion += '#'
+                nchar = expresion[i+1]
+
+                if self.is_operand(char) and self.is_operator(nchar):
+                    concat_expresion += ''
+                elif self.is_unary(char) and self.is_operand(nchar):
+                    concat_expresion += '.'
+                elif self.is_binary(char) and self.is_operand(nchar):
+                    concat_expresion += ''
+                elif self.is_operand(char) and self.is_operand(nchar):
+                    concat_expresion += '.'
+                elif self.is_operator(char) and nchar == "(":
+                    concat_expresion += '.'
+                elif self.is_operator(nchar) and (nchar == ")" or self.is_operand(nchar)):
+                    concat_expresion += ''
+                elif char in [")", "("] and self.is_operator(nchar):
+                    concat_expresion += ''
 
         return concat_expresion
 
+    def is_unary(self, char):
+        return char in self.unary_operators
+    
+    def is_binary(self, char):
+        return char in self.binary_operators
+    
     def is_operator(self, char):
         return char in self.operators.keys()
 
     def is_operand(self, char):
-        return char.isalpha()
-    
+        if char == 'ε':
+            return True
+        else:
+            return True if char.isalpha() else char.isnumeric()
+
     def get_precedence(self, operator):
         return self.operators[operator]
-    
+
     def convert(self):
-        for i in self.expresion:
-            if self.is_operand(i):
-                self.output.append(i)
-            elif i == '(':
-                self.stack.append(i)
-            elif i == ')':
-                while self.stack[-1] != '(':
-                    self.output.append(self.stack.pop())
-                self.stack.pop()
+        stack = []
+        output = []
+        print(self.expresion)
+        self.expresion = ([*self.expresion])
+        last = ''
+        for i in range(len(self.expresion)):
+            if self.is_operand(self.expresion[i]):
+                output.append(self.expresion[i])
+            elif self.expresion[i] == '(':
+                stack.append(self.expresion[i])
+            elif self.expresion[i] == ')':
+                while stack[-1] != '(':
+                    output.append(stack.pop())
+                if stack.pop() != '(':
+                    print('Error: Hace falta un paréntesis')
+                    return
+            elif self.is_operator(self.expresion[i]):
+                while stack and self.get_precedence(self.expresion[i]) <= self.get_precedence(stack[-1]):
+                    output.append(stack.pop())
+                stack.append(self.expresion[i])
+                
             else:
-                while self.stack and self.get_precedence(i) <= self.get_precedence(self.stack[-1]):
-                    self.output.append(self.stack.pop())
-                self.stack.append(i)
+                print(self.expresion[i])
+                print('Error: Caracter no válido')
+                return
+        while stack:
+            output.append(stack.pop())
+
+        return output
