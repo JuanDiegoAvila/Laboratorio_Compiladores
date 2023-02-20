@@ -6,11 +6,12 @@ class Thomson(object):
         self.postfix = postfix
         self.conteo_nodos = 0
         self.nodos = []
-        self.thomson(([*postfix]))
-        self.visitados = self.order_nodos(self.inicial)
+        self.inicio, self.final = self.thomson(([*postfix]))
+        self.inicio.inicial = True
+        self.final.final = True
+        self.visitados = self.order_nodos(self.inicio)
 
     def order_nodos(self, first_node):
-        first_node.inicial = True
         visitados = {first_node}
         queue = deque([first_node])
         nodos_ordenados = []
@@ -24,7 +25,6 @@ class Thomson(object):
                     visitados.add(s_nodo)
                     queue.append(s_nodo)
 
-        nodos_ordenados[len(nodos_ordenados)-1].final = True
         return nodos_ordenados
 
     
@@ -54,11 +54,6 @@ class Thomson(object):
             
             if isinstance(nodo2, str):
                 nodo2 = self.simple(nodo2)
-
-            
-            if len(stack) <= 0:
-                self.inicial = nodo2[0]
-        
             
             if primero == "|":
                 nodo1i = nodo1[0]
@@ -67,7 +62,7 @@ class Thomson(object):
                 nodo2i = nodo2[0]
                 nodo2f = nodo2[1]
                 
-                return self.orS(nodo2i, nodo2f, nodo1i, nodo1f)
+                return self.orS(nodo1i, nodo1f, nodo2i, nodo2f)
             
             elif primero == ".":
                 nodo1i = nodo1[0]
@@ -87,14 +82,12 @@ class Thomson(object):
             if isinstance(nodo1, str):
                 nodo1 = self.simple(nodo1)
 
-            if len(stack) <= 0:
+            if len(self.nodos) == len(self.postfix):
                 self.inicial = nodo1[0]
 
             if primero == "*":
                 nodo1i = nodo1[0]
                 nodo1f = nodo1[1]
-                print(nodo1i)
-                print(nodo1f)
                 return self.kleene(nodo1i, nodo1f)
 
             elif primero == "+":
@@ -107,6 +100,7 @@ class Thomson(object):
         self.conteo_nodos += 1
         final = nodo1i
         self.conteo_nodos += 1
+
         inicio.addTransition(final, "ε")
 
         return [nodo2i, nodo1f]
@@ -114,13 +108,10 @@ class Thomson(object):
     def kleene(self, nodo1i, nodo1f):
         inicio = Nodo(self.conteo_nodos, False, False, {})
         self.conteo_nodos += 1
-        
         n1 = nodo1i
         self.conteo_nodos += 1
-        
         n2 = nodo1f
         self.conteo_nodos += 1
-        
         final = Nodo(self.conteo_nodos, False, False, {})
         self.conteo_nodos += 1
 
@@ -136,13 +127,13 @@ class Thomson(object):
     def orS(self, nodo1i, nodo1f, nodo2i, nodo2f):
         inicio = Nodo(self.conteo_nodos, False, False, {})
         self.conteo_nodos += 1
-        n1 = nodo1i
+        n1 = nodo2i
         self.conteo_nodos += 1
-        n2 = nodo1f
+        n2 = nodo2f
         self.conteo_nodos += 1
-        n3 = nodo2i
+        n3 = nodo1i
         self.conteo_nodos += 1
-        n4 = nodo2f
+        n4 = nodo1f
         self.conteo_nodos += 1
         final = Nodo(self.conteo_nodos, False, False, {})
         self.conteo_nodos += 1

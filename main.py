@@ -10,7 +10,7 @@ expresion = "(a|b)*abb"
 expresion = "a|b"
 expresion = "0?(1?)?0*"
 
-# arbol = Arbol(expresion)
+expresion = "a|x*a*|ε"
 
 
 postfix = Postfix(expresion)
@@ -18,6 +18,5 @@ expresion = postfix.final
 print(expresion)
 thomson = Thomson(expresion)
 nodos = thomson.visitados
-#print(nodos)
 grafo = Grafo(nodos)
 

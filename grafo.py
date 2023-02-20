@@ -6,22 +6,7 @@ class Grafo(object):
     def __init__(self, nodos):
         self.nodos = nodos
         self.grafo_graphviz()
-
-    # def dibujar_grafo(self):
-    #     G = nx.Graph()
-    #     for nodo in self.nodos:
-    #         G.add_node(nodo.conteo)
-    #         for key, value in nodo.transicion.items():
-    #             print(nodo.conteo, key.conteo)
-    #             G.add_edge(nodo.conteo, key.conteo, title=value)
-    #     edge_labels = nx.get_edge_attributes(G, 'title')
-    #     # label = nx.nodes(G)
-    #     pos = nx.spring_layout(G)
-    #     nx.draw(G, pos, with_labels=True)
-    #     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-    #     plt.show()
-    
-
+        
     def grafo_graphviz(self):
         G = gv.Digraph(format='png', graph_attr={'rankdir':'LR'})
         for nodo in self.nodos:
