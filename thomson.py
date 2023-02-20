@@ -1,9 +1,32 @@
+from collections import deque
+from grafo import *
+
 class Thomson(object):
     def __init__(self, postfix):
         self.postfix = postfix
         self.conteo_nodos = 0
         self.nodos = []
-        self.afn = self.thomson(([*postfix]))
+        self.thomson(([*postfix]))
+        self.visitados = self.order_nodos(self.inicial)
+
+    def order_nodos(self, first_node):
+        first_node.inicial = True
+        visitados = {first_node}
+        queue = deque([first_node])
+        nodos_ordenados = []
+
+        while queue:
+            nodo = queue.popleft()
+            nodos_ordenados.append(nodo)
+
+            for s_nodo, valor in nodo.transicion.items():
+                if s_nodo not in visitados:
+                    visitados.add(s_nodo)
+                    queue.append(s_nodo)
+
+        nodos_ordenados[len(nodos_ordenados)-1].final = True
+        return nodos_ordenados
+
     
     def thomson(self, stack):
         binarios = '|.'
@@ -24,23 +47,34 @@ class Thomson(object):
             if nodo2 in operadores:
                 stack.append(nodo2)
                 nodo2 = self.thomson(stack)
-            
-            #if isinstance(nodo1, str):
-            nodo1i, nodo1f = self.simple(nodo1)
-            
-            #if isinstance(nodo2, str):
-            nodo2i, nodo2f = self.simple(nodo2)
-            
-            if primero == "*":
-                return self.kleene(nodo1i, nodo1f)
 
-            elif primero == "+":
-                return self.positiva(nodo2i, nodo2f)
             
-            elif primero == "|":
-                return self.orS(nodo1i, nodo1f, nodo2i, nodo2f)
+            if isinstance(nodo1, str):
+                nodo1 = self.simple(nodo1)
+            
+            if isinstance(nodo2, str):
+                nodo2 = self.simple(nodo2)
+
+            
+            if len(stack) <= 0:
+                self.inicial = nodo2[0]
+        
+            
+            if primero == "|":
+                nodo1i = nodo1[0]
+                nodo1f = nodo1[1]
+
+                nodo2i = nodo2[0]
+                nodo2f = nodo2[1]
+                
+                return self.orS(nodo2i, nodo2f, nodo1i, nodo1f)
             
             elif primero == ".":
+                nodo1i = nodo1[0]
+                nodo1f = nodo1[1]
+
+                nodo2i = nodo2[0]
+                nodo2f = nodo2[1]
                 return self.concat(nodo1i, nodo1f, nodo2i, nodo2f)
         
         elif primero in unarios:
@@ -50,28 +84,43 @@ class Thomson(object):
                 stack.append(nodo1)
                 nodo1 = self.thomson(stack)
 
-            nodo1i, nodo1f = self.simple(nodo1)
-            
             if isinstance(nodo1, str):
                 nodo1 = self.simple(nodo1)
-            
+
+            if len(stack) <= 0:
+                self.inicial = nodo1[0]
+
             if primero == "*":
+                nodo1i = nodo1[0]
+                nodo1f = nodo1[1]
+                print(nodo1i)
+                print(nodo1f)
                 return self.kleene(nodo1i, nodo1f)
 
             elif primero == "+":
+                nodo1i = nodo1[0]
+                nodo1f = nodo1[1]
                 return self.positiva(nodo1i, nodo1f)
             
-    
-    def concat(self):
-        return None
+    def concat(self, nodo1i, nodo1f, nodo2i, nodo2f):
+        inicio = nodo2f
+        self.conteo_nodos += 1
+        final = nodo1i
+        self.conteo_nodos += 1
+        inicio.addTransition(final, "ε")
+
+        return [nodo2i, nodo1f]
 
     def kleene(self, nodo1i, nodo1f):
         inicio = Nodo(self.conteo_nodos, False, False, {})
         self.conteo_nodos += 1
+        
         n1 = nodo1i
         self.conteo_nodos += 1
+        
         n2 = nodo1f
         self.conteo_nodos += 1
+        
         final = Nodo(self.conteo_nodos, False, False, {})
         self.conteo_nodos += 1
 
@@ -81,17 +130,50 @@ class Thomson(object):
         n2.addTransition(final, "ε")
 
         self.nodos.append(inicio)
-        self.nodos.append(n1)
-        self.nodos.append(n2)
         self.nodos.append(final)
-        return inicio, final
+        return [inicio, final]
     
-    def orS(self, nodo):
+    def orS(self, nodo1i, nodo1f, nodo2i, nodo2f):
+        inicio = Nodo(self.conteo_nodos, False, False, {})
+        self.conteo_nodos += 1
+        n1 = nodo1i
+        self.conteo_nodos += 1
+        n2 = nodo1f
+        self.conteo_nodos += 1
+        n3 = nodo2i
+        self.conteo_nodos += 1
+        n4 = nodo2f
+        self.conteo_nodos += 1
+        final = Nodo(self.conteo_nodos, False, False, {})
+        self.conteo_nodos += 1
 
-        return None
+        inicio.addTransition(n1, "ε")
+        inicio.addTransition(n3, "ε")
+        n2.addTransition(final, "ε")
+        n4.addTransition(final, "ε")
+
+        self.nodos.append(inicio)
+        self.nodos.append(final)
+
+        return [inicio, final]
     
-    def positiva(self, nodo):
-        return None
+    def positiva(self, nodo1i, nodo1f):
+        inicio = Nodo(self.conteo_nodos, False, False, {})
+        self.conteo_nodos += 1
+        n1 = nodo1i
+        self.conteo_nodos += 1
+        n2 = nodo1f
+        self.conteo_nodos += 1
+        final = Nodo(self.conteo_nodos, False, False, {})
+        self.conteo_nodos += 1
+
+        inicio.addTransition(n1, "ε")
+        n2.addTransition(n1, "ε")
+        n2.addTransition(final, "ε")
+
+        self.nodos.append(inicio)
+        self.nodos.append(final)
+        return [inicio, final]
 
     def simple(self, valor):
         inicio = Nodo(self.conteo_nodos, False, False, {})
@@ -102,7 +184,8 @@ class Thomson(object):
 
         self.nodos.append(inicio)
         self.nodos.append(final)
-        return inicio, final
+        return [inicio, final]
+    
         
 
 
@@ -121,5 +204,6 @@ class Nodo(object):
 
     def get_transition(self, nodo):
         return self.transicion[nodo]
-        
-        
+
+    def __str__(self):
+        return str(self.conteo)

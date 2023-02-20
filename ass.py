@@ -2,7 +2,6 @@ class Arbol(object):
     def __init__(self, expresion):
         self.expresion = expresion
         self.stack = self.expresion_stack()
-        print(self.stack)
 
     def expresion_stack(self):
         stack = ([*self.expresion])

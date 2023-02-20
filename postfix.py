@@ -69,7 +69,6 @@ class Postfix():
     def convert(self):
         stack = []
         output = []
-        print(self.expresion)
         self.expresion = ([*self.expresion])
         last = ''
         for i in range(len(self.expresion)):
