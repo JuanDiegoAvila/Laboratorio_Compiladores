@@ -40,7 +40,10 @@ class Postfix():
             raise Exception(inicio + error + final)
 
         for char in expresion:
-            if char == '(':
+            if char == ' ':
+                error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede haber espacios en blanco.\n"
+                raise Exception(inicio + error + final)
+            elif char == '(':
                 parentesis_izq += 1
             elif char == ')':
                 parentesis_der += 1
