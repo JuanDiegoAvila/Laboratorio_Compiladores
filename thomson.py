@@ -82,9 +82,6 @@ class Thomson(object):
             if isinstance(nodo1, str):
                 nodo1 = self.simple(nodo1)
 
-            if len(self.nodos) == len(self.postfix):
-                self.inicial = nodo1[0]
-
             if primero == "*":
                 nodo1i = nodo1[0]
                 nodo1f = nodo1[1]
@@ -94,6 +91,9 @@ class Thomson(object):
                 nodo1i = nodo1[0]
                 nodo1f = nodo1[1]
                 return self.positiva(nodo1i, nodo1f)
+        
+        else:
+            return self.simple(primero)
             
     def concat(self, nodo1i, nodo1f, nodo2i, nodo2f):
         inicio = nodo2f

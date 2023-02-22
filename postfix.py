@@ -16,10 +16,67 @@ class Postfix():
         self.binary_operators = '|.'
         self.unary_operators = '*+?'
 
+        self.error_check(expresion)
+
         self.expresion = self.concat_expression(expresion)
         self.output = self.convert()
         self.final = ''.join(self.output)
         self.final = self.final.replace('?', 'ε|')
+
+    def error_check(self, expresion):
+        
+        parentesis_izq = 0
+        parentesis_der = 0
+        
+        inicio = "\n==============================================================================================\n"
+        final = "=============================================================================================="
+
+        if self.is_operator(expresion[0]) and expresion[0] not in '()':
+            error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede iniciar con un operador.\n"
+            raise Exception(inicio + error + final)
+
+        if len(expresion) == 0:
+            error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo se ingresó ninguna expresión.\n"
+            raise Exception(inicio + error + final)
+
+        for char in expresion:
+            if char == '(':
+                parentesis_izq += 1
+            elif char == ')':
+                parentesis_der += 1
+                if parentesis_izq == 0 or parentesis_der > parentesis_izq:
+                    error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo hay un '(' que iguale un parentesis ')'. \n"
+                    raise Exception(inicio + error + final)
+            elif char == '|':
+                if self.is_operator(expresion[expresion.index(char)+1]):
+                    error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede haber un operador seguido de |.\n"
+                    raise Exception(inicio + error + final)
+            elif char == '+' and ( not self.is_operand(expresion[expresion.index(char)-1]) and expresion[expresion.index(char)-1] != ')'):
+                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador + no se está aplicando a ningín símbolo.\n"
+                raise Exception(inicio + error + final)
+            elif char == '*' and ( not self.is_operand(expresion[expresion.index(char)-1]) and expresion[expresion.index(char)-1] != ')'):
+                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador * no se está aplicando a ningín símbolo.\n"
+                raise Exception(inicio + error + final)
+            elif char == '?' and ( not self.is_operand(expresion[expresion.index(char)-1]) and expresion[expresion.index(char)-1] != ')'):
+                print(char)
+                print(expresion[expresion.index(char)-1])
+                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador ? no se está aplicando a ningín símbolo.\n"
+                raise Exception(inicio + error + final)
+            elif char == '|' and ( not self.is_operand(expresion[expresion.index(char)-1]) and expresion[expresion.index(char)-1] != ')'):
+                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n"
+                raise Exception(inicio + error + final)
+            elif char == '|' and ( not self.is_operand(expresion[expresion.index(char)+1]) and expresion[expresion.index(char)+1] != '('):
+                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n"
+                raise Exception(inicio + error + final)
+            
+        if self.is_binary(expresion[-1]): 
+            error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede terminar con un operador binario.\n"
+            raise Exception(inicio + error + final)
+        
+        if parentesis_izq != parentesis_der:
+            error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo existe la misma cantidad de '(' que de ')'.\n"
+            raise Exception(inicio + error + final)
+    
 
     def concat_expression(self, expresion):
         concat_expresion = ""
@@ -31,21 +88,9 @@ class Postfix():
             if i+1 < len(expresion):
                 nchar = expresion[i+1]
 
-                if self.is_operand(char) and self.is_operator(nchar):
-                    concat_expresion += ''
-                elif self.is_unary(char) and self.is_operand(nchar):
-                    concat_expresion += '.'
-                elif self.is_binary(char) and self.is_operand(nchar):
-                    concat_expresion += ''
-                elif self.is_operand(char) and self.is_operand(nchar):
-                    concat_expresion += '.'
-                elif self.is_operator(char) and nchar == "(":
-                    concat_expresion += '.'
-                elif self.is_operator(nchar) and (nchar == ")" or self.is_operand(nchar)):
-                    concat_expresion += ''
-                elif char in [")", "("] and self.is_operator(nchar):
-                    concat_expresion += ''
-
+                if char != "(" and nchar != ")" and not self.is_operator(nchar) and not self.is_binary(char):
+                    concat_expresion += "."
+    
         return concat_expresion
 
     def is_unary(self, char):
