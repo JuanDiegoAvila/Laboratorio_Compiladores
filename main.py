@@ -13,7 +13,7 @@ expresion = "a**"
 expresion = "0?(1?)?0*"
 expresion = "a|x*a*|ε"
 expresion = "(a|b)|(c|d)"
-expresion = "(a|b) *|(c|d))*"
+expresion = "(a|b)*|(c|d)*"
 
 
 postfix = Postfix(expresion)

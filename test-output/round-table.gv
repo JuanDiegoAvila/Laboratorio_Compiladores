@@ -1,8 +1,47 @@
 digraph {
 	graph [rankdir=LR]
 	inicio [label="" shape=none]
+	28
+	inicio -> 28
+	28 -> 24 [label="ε"]
+	28 -> 10 [label="ε"]
+	24
+	24 -> 27 [label="ε"]
+	24 -> 18 [label="ε"]
+	10
+	10 -> 13 [label="ε"]
+	10 -> 4 [label="ε"]
+	27
+	27 -> 33 [label="ε"]
+	18
+	18 -> 16 [label="ε"]
+	18 -> 14 [label="ε"]
+	13
+	13 -> 33 [label="ε"]
+	4
+	4 -> 2 [label="ε"]
+	4 -> 0 [label="ε"]
+	33 [peripheries=2]
+	16
+	16 -> 17 [label=a]
+	14
+	14 -> 15 [label=b]
+	2
+	2 -> 3 [label=c]
 	0
-	inicio -> 0
-	0 -> 1 [label=a]
-	1 [peripheries=2]
+	0 -> 1 [label=d]
+	17
+	17 -> 23 [label="ε"]
+	15
+	15 -> 23 [label="ε"]
+	3
+	3 -> 9 [label="ε"]
+	1
+	1 -> 9 [label="ε"]
+	23
+	23 -> 18 [label="ε"]
+	23 -> 27 [label="ε"]
+	9
+	9 -> 4 [label="ε"]
+	9 -> 13 [label="ε"]
 }

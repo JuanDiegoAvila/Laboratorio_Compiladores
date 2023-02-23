@@ -27,58 +27,70 @@ class Postfix():
         
         parentesis_izq = 0
         parentesis_der = 0
+        herror = False
+        error = ''
         
         inicio = "\n==============================================================================================\n"
         final = "=============================================================================================="
 
         if self.is_operator(expresion[0]) and expresion[0] not in '()':
-            error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede iniciar con un operador.\n"
-            raise Exception(inicio + error + final)
+            error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede iniciar con un operador.\n"
+            herror = True
 
         if len(expresion) == 0:
-            error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo se ingresó ninguna expresión.\n"
-            raise Exception(inicio + error + final)
+            error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo se ingresó ninguna expresión.\n"
+            herror = True
+        
+        expresion = ([*expresion])
 
-        for char in expresion:
-            if char == ' ':
-                error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede haber espacios en blanco.\n"
-                raise Exception(inicio + error + final)
-            elif char == '(':
+        for char in range(len(expresion)):
+            if expresion[char] == ' ':
+                error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede haber espacios en blanco.\n\n"
+                herror = True
+            elif expresion[char] == '(':
                 parentesis_izq += 1
-            elif char == ')':
+            elif expresion[char] == ')':
                 parentesis_der += 1
-                if parentesis_izq == 0 or parentesis_der > parentesis_izq:
-                    error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo hay un '(' que iguale un parentesis ')'. \n"
-                    raise Exception(inicio + error + final)
-            elif char == '|':
-                if self.is_operator(expresion[expresion.index(char)+1]):
-                    error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede haber un operador seguido de |.\n"
-                    raise Exception(inicio + error + final)
-            elif char == '+' and ( not self.is_operand(expresion[expresion.index(char)-1]) and expresion[expresion.index(char)-1] != ')'):
-                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador + no se está aplicando a ningín símbolo.\n"
-                raise Exception(inicio + error + final)
-            elif char == '*' and ( not self.is_operand(expresion[expresion.index(char)-1]) and expresion[expresion.index(char)-1] != ')'):
-                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador * no se está aplicando a ningín símbolo.\n"
-                raise Exception(inicio + error + final)
-            elif char == '?' and ( not self.is_operand(expresion[expresion.index(char)-1]) and expresion[expresion.index(char)-1] != ')'):
-                print(char)
-                print(expresion[expresion.index(char)-1])
-                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador ? no se está aplicando a ningín símbolo.\n"
-                raise Exception(inicio + error + final)
-            elif char == '|' and ( not self.is_operand(expresion[expresion.index(char)-1]) and expresion[expresion.index(char)-1] != ')'):
-                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n"
-                raise Exception(inicio + error + final)
-            elif char == '|' and ( not self.is_operand(expresion[expresion.index(char)+1]) and expresion[expresion.index(char)+1] != '('):
-                error = "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n"
-                raise Exception(inicio + error + final)
+                
+            elif expresion[char] == '|':
+                if self.is_operator(expresion[char+1]) and expresion[char+1] != '(':
+                    error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede haber un operador seguido de |.\n\n"
+                    herror = True
+            elif expresion[char] == '+' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
+                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador + no se está aplicando a ningín símbolo.\n\n"
+                herror = True
+            elif expresion[char] == '*' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
+                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador * no se está aplicando a ningín símbolo.\n\n"
+                herror = True
+            elif expresion[char] == '?' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
+                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador ? no se está aplicando a ningín símbolo.\n\n"
+                herror = True
+            elif expresion[char] == '|' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
+                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n\n"
+                herror = True
+            elif expresion[char] == '|' and ( not self.is_operand(expresion[char+1]) and expresion[char+1] != '('):
+                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n\n"
+                herror = True
             
         if self.is_binary(expresion[-1]): 
-            error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede terminar con un operador binario.\n"
+            error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede terminar con un operador binario.\n\n"
+            herror = True
+        
+        
+        # if parentesis_izq == 0 or parentesis_der > parentesis_izq:
+        #     error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo hay un '(' que iguale un parentesis ')'. \n"
+        #     herror = True
+        # elif parentesis_izq > parentesis_der:
+        #     error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo hay un ')' que iguale un parentesis '('.\n"
+        #     herror = True
+        elif parentesis_izq != parentesis_der:
+            error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo existe la misma cantidad de '(' que de ')'.\n\n"
+            herror = True
+            
+        if herror:
             raise Exception(inicio + error + final)
         
-        if parentesis_izq != parentesis_der:
-            error = "\tError: La expresión regular ingresada es incorrecta. \n\tNo existe la misma cantidad de '(' que de ')'.\n"
-            raise Exception(inicio + error + final)
+       
     
 
     def concat_expression(self, expresion):
