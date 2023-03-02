@@ -41,6 +41,11 @@ class Postfix():
             error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo se ingresó ninguna expresión.\n"
             herror = True
         
+        if self.is_binary(expresion[-1]): 
+            error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede terminar con un operador binario.\n\n"
+            herror = True
+        
+        
         expresion = ([*expresion])
 
         for char in range(len(expresion)):
@@ -51,31 +56,28 @@ class Postfix():
                 parentesis_izq += 1
             elif expresion[char] == ')':
                 parentesis_der += 1
-                
-            elif expresion[char] == '|':
-                if self.is_operator(expresion[char+1]) and expresion[char+1] != '(':
-                    error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede haber un operador seguido de |.\n\n"
-                    herror = True
-            elif expresion[char] == '+' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
-                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador + no se está aplicando a ningín símbolo.\n\n"
-                herror = True
-            elif expresion[char] == '*' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
-                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador * no se está aplicando a ningín símbolo.\n\n"
-                herror = True
-            elif expresion[char] == '?' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
-                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador ? no se está aplicando a ningín símbolo.\n\n"
-                herror = True
-            elif expresion[char] == '|' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
-                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n\n"
-                herror = True
-            elif expresion[char] == '|' and ( not self.is_operand(expresion[char+1]) and expresion[char+1] != '('):
-                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n\n"
-                herror = True
             
-        if self.is_binary(expresion[-1]): 
-            error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede terminar con un operador binario.\n\n"
-            herror = True
-        
+            if char + 1 < len(expresion):
+                if expresion[char] == '|':
+                    if self.is_operator(expresion[char+1]) and expresion[char+1] != '(':
+                        error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo puede haber un operador seguido de |.\n\n"
+                        herror = True
+                elif expresion[char] == '+' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
+                    error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador + no se está aplicando a ningín símbolo.\n\n"
+                    herror = True
+                elif expresion[char] == '*' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
+                    error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador * no se está aplicando a ningín símbolo.\n\n"
+                    herror = True
+                elif expresion[char] == '?' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
+                    error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador ? no se está aplicando a ningín símbolo.\n\n"
+                    herror = True
+                elif expresion[char] == '|' and ( not self.is_operand(expresion[char-1]) and expresion[char-1] != ')'):
+                    error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n\n"
+                    herror = True
+                elif expresion[char] == '|' and ( not self.is_operand(expresion[char+1]) and expresion[char+1] != '('):
+                    error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n\n"
+                    herror = True
+            
         
         # if parentesis_izq == 0 or parentesis_der > parentesis_izq:
         #     error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo hay un '(' que iguale un parentesis ')'. \n"
@@ -83,7 +85,7 @@ class Postfix():
         # elif parentesis_izq > parentesis_der:
         #     error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo hay un ')' que iguale un parentesis '('.\n"
         #     herror = True
-        elif parentesis_izq != parentesis_der:
+        if parentesis_izq != parentesis_der:
             error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo existe la misma cantidad de '(' que de ')'.\n\n"
             herror = True
             
