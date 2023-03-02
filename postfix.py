@@ -1,6 +1,43 @@
 
+def check_expresion(expresion):
+    postfix = Postfix(expresion)
+    postfix.error_check(expresion)
+
+    return postfix.concat_expression(expresion)
+
+def postive_format(expresion):
+    expresion = ([*expresion])
+
+    for char in range(len(expresion)):
+
+        if expresion[char] == '+':
+            prev_char = expresion[char-1]
+            if prev_char == ')':
+                i = char-2
+                temp = []
+                while i >= 0:
+                    if expresion[i] == '(':
+                        temp = reversed(temp)
+                        temp = list(temp)
+                        temp.insert(0, '(')
+                        temp.append(')')
+                        temp.append('*')
+
+                        expresion.remove(expresion[char])
+                        expresion[char:len(temp)+char] = temp
+                        # expresion.extend(temp)
+                        break
+                    else:
+                        temp.append(expresion[i])
+                    i -= 1
+            else:
+                expresion[char] = prev_char + '*'
+
+    return ''.join(expresion)
+
+
 class Postfix():
-    def __init__(self, expresion):
+    def __init__(self, expresion, AFD = False):
         self.stack = []
         self.output = []
         self.operators = {
@@ -12,13 +49,16 @@ class Postfix():
             '#': 1,
             '(': 1
         }
+        self.AFD = AFD
+        self.expresion = expresion
+    
+    def toPostfix(self):
+        self.error_check(self.expresion)
 
-        self.binary_operators = '|.'
-        self.unary_operators = '*+?'
+        if self.AFD:
+            self.expresion = postive_format(self.expresion)
 
-        self.error_check(expresion)
-
-        self.expresion = self.concat_expression(expresion)
+        self.expresion = self.concat_expression(self.expresion)
         self.output = self.convert()
         self.final = ''.join(self.output)
         self.final = self.final.replace('?', 'ε|')
@@ -57,6 +97,10 @@ class Postfix():
             elif expresion[char] == ')':
                 parentesis_der += 1
             
+            elif not self.is_operand(expresion[char]) and not self.is_operator(expresion[char]) and not '#':
+                error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl símbolo '" + expresion[char] + "' no es válido.\n\n"
+                herror = True
+            
             if char + 1 < len(expresion):
                 if expresion[char] == '|':
                     if self.is_operator(expresion[char+1]) and expresion[char+1] != '(':
@@ -77,14 +121,7 @@ class Postfix():
                 elif expresion[char] == '|' and ( not self.is_operand(expresion[char+1]) and expresion[char+1] != '('):
                     error += "\tError: La expresión regular ingresada es incorrecta. \n\tEl operador | no se está aplicando a ningín símbolo.\n\n"
                     herror = True
-            
-        
-        # if parentesis_izq == 0 or parentesis_der > parentesis_izq:
-        #     error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo hay un '(' que iguale un parentesis ')'. \n"
-        #     herror = True
-        # elif parentesis_izq > parentesis_der:
-        #     error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo hay un ')' que iguale un parentesis '('.\n"
-        #     herror = True
+                    
         if parentesis_izq != parentesis_der:
             error += "\tError: La expresión regular ingresada es incorrecta. \n\tNo existe la misma cantidad de '(' que de ')'.\n\n"
             herror = True
@@ -107,17 +144,17 @@ class Postfix():
 
                 if char != "(" and nchar != ")" and not self.is_operator(nchar) and not self.is_binary(char):
                     concat_expresion += "."
-    
+
         return concat_expresion
 
     def is_unary(self, char):
-        return char in self.unary_operators
+        return char in '*+?'
     
     def is_binary(self, char):
-        return char in self.binary_operators
+        return char in '|.'
     
     def is_operator(self, char):
-        return char in self.operators.keys()
+        return char in '*+?.|'
 
     def is_operand(self, char):
         if char == 'ε':
@@ -148,11 +185,7 @@ class Postfix():
                 while stack and self.get_precedence(self.expresion[i]) <= self.get_precedence(stack[-1]):
                     output.append(stack.pop())
                 stack.append(self.expresion[i])
-                
-            else:
-                print(self.expresion[i])
-                print('Error: Caracter no válido')
-                return
+
         while stack:
             output.append(stack.pop())
 
