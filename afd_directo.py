@@ -1,4 +1,8 @@
 
+def is_operand(self, char):
+    return True if char.isalpha() else char.isnumeric()
+
+
 class AFD_D(object):
     def __init__(self, expresion):
         self.expresion = expresion+'#.'
@@ -15,10 +19,57 @@ class AFD_D(object):
         ramasRaiz = arbol.Arbol(self.expresion)
         ramas = arbol.ramas
         ramas.append(ramasRaiz)
+        
+        for rama in ramas:
+            if rama.nullable == None:
+                self.nullable(rama)
+            if rama.first_pos == None:
+                self.firstpos(rama)
+            if rama.last_pos == None:
+                self.lastpos(rama)
 
-        print(ramas)
-
+    def nullable(self, nodo):
+        if nodo.valor == 'ε':
+            nodo.nullable = True
+        elif is_operand(nodo.nullable):
+            nodo.nullable = False
+        elif nodo.valor == '*':
+            nodo.nullable = True
+        elif nodo.valor == '.':
+            nodo.nullable = nodo.left.nullable and nodo.right.nullable
+        elif nodo.valor == '|':
+            nodo.nullable = nodo.left.nullable or nodo.right.nullable
     
+    def firstpos(self, nodo):
+        if nodo.valor == 'ε':
+            nodo.fistpos = []
+        if is_operand(nodo.valor):
+            nodo.first_pos = [nodo.valor]
+        elif nodo.valor == '*':
+            nodo.first_pos = nodo.left.first_pos
+        elif nodo.valor == '.':
+            if nodo.left.nullable:
+                nodo.first_pos = nodo.left.first_pos + nodo.right.first_pos
+            else:
+                nodo.first_pos = nodo.left.first_pos
+        elif nodo.valor == '|':
+            nodo.first_pos = nodo.left.first_pos + nodo.right.first_pos
+
+    def lastpos(self, nodo):
+        if nodo.valor == 'ε':
+            nodo.last_pos = []
+        if is_operand(nodo.valor):
+            nodo.last_pos = [nodo.valor]
+        elif nodo.valor == '*':
+            nodo.last_pos = nodo.left.last_pos
+        elif nodo.valor == '.':
+            if nodo.right.nullable:
+                nodo.last_pos = nodo.left.last_pos + nodo.right.last_pos
+            else:
+                nodo.last_pos = nodo.right.last_pos
+        elif nodo.valor == '|':
+            nodo.last_pos = nodo.left.last_pos + nodo.right.last_pos
+
 
 class ConstruccionArbol(object):
     def __init__(self):
