@@ -51,6 +51,7 @@ while not salir:
 
 
         afd = AFD_D(expresion)
+        grafo = Grafo(afd.nodos)
 
 
         pass

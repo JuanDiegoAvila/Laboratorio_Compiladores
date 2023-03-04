@@ -1,5 +1,6 @@
 from collections import deque
 from grafo import *
+from prettytable import PrettyTable
 
 class Thomson(object):
     def __init__(self, postfix):
@@ -195,6 +196,13 @@ class Nodo(object):
 
     def get_transition(self, nodo):
         return self.transicion[nodo]
+
+    def print_transiciones(self):
+        for nodo in self.transicion.keys():
+            print(self.conteo, " -> ", nodo.conteo, " : ", self.transicion[nodo])
+    
+    def __repr__(self):
+        return str(self.conteo)
 
     def __str__(self):
         return str(self.conteo)

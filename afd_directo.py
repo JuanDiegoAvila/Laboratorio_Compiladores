@@ -1,7 +1,24 @@
 from prettytable import PrettyTable
+from thomson import *
 
 def is_operand(char):
     return True if char.isalpha() else char.isnumeric()
+
+def order_nodos(first_node):
+        visitados = {first_node}
+        queue = deque([first_node])
+        nodos_ordenados = []
+
+        while queue:
+            nodo = queue.popleft()
+            nodos_ordenados.append(nodo)
+
+            for s_nodo, valor in nodo.transicion.items():
+                if s_nodo not in visitados:
+                    visitados.add(s_nodo)
+                    queue.append(s_nodo)
+
+        return nodos_ordenados
 
 
 class AFD_D(object):
@@ -11,13 +28,77 @@ class AFD_D(object):
         self.alfabeto = self.getAlfabeto()
         self.followposT = {}
         self.ramas = []
-        self.construccion_directa()
+        self.transiciones, self.estados = self.construccion_directa()
+        self.iniciales_finales(self.estados)
+        self.nodos = self.crear_nodos(self.transiciones, self.estados)
 
+    
+    def iniciales_finales(self, estados):
+        finales = []
+        for follow in self.followposT:
+            if len(self.followposT) in self.followposT[follow]:
+                finales.append(follow)
+
+        estados_f = []
+        for estado in estados:
+            if len(self.followposT) in estado["posiciones"]:
+                estados_f.append(estado["estado"])
+
+        for estado in estados:
+            numero = estado["estado"].split('S')
+            numero = int(numero[1]) + 1
+
+            estado["inicial"] = False
+            estado["aceptacion"] = False
+
+            if numero in finales:
+                estado["aceptacion"] = True
+
+        estados[0]["inicial"] = True
+                
+
+    def crear_nodos(self, transiciones, estados):
+        nodos = []
+        for estado in estados:
+            nodo = Nodo(estado["estado"])
+            nodo.inicial = estado["inicial"]
+            nodo.final = estado["aceptacion"]
+            nodos.append(nodo)
+            
+        print(estados)
+        for nodo in nodos:
+            transicion = int(nodo.conteo.split('S')[1]) +1
+            for index, value in transiciones[transicion].items():
+                if value != []:
+                    for estado in estados:
+                        print(estado)
+                        print(value)
+                        input()
+                        if estado["posiciones"] == value:
+                            print(estado["estado"])
+                            nodos_filtrados = filter(lambda n: n.conteo == estado["estado"], nodos)
+                            
+                            # for i in nodos_filtrados:
+                            #     print(i)
+                            # input()
+                            # transicion = map(lambda n: nodo.addTransition(n, index), nodos_filtrados)
+
+                            for n in nodos:
+                                if n.conteo == estado["estado"]:
+                                    print(n, n.conteo)
+                                    nodo.addTransition(n, index)
+
+        # nodos = order_nodos(nodos[0])
+        for i in nodos:
+            print(i)
+            i.print_transiciones()
+
+        return nodos
         
     def getAlfabeto(self):
         alfabeto = []
         for char in self.expresion:
-            if is_operand(char) and char not in alfabeto:
+            if is_operand(char) and char not in alfabeto and char!='ε':
                 alfabeto.append(char)
         return alfabeto
 
@@ -40,50 +121,49 @@ class AFD_D(object):
         self.followpos(ramas[len(ramas)-1])
         self.followposT = {k: v for k, v in sorted(self.followposT.items(), key=lambda item: item[0])}
 
-        print(self.followposT)
-        self.tabla_transiciones(ramas)
+        return self.tabla_transiciones(ramas)
 
-    def nullable(self, nodo):
-        if nodo.valor == 'ε':
-            nodo.nullable = True
-        elif is_operand(nodo.valor):
-            nodo.nullable = False
-        elif nodo.valor == '*':
-            nodo.nullable = True
-        elif nodo.valor == '.':
-            nodo.nullable = nodo.left.nullable and nodo.right.nullable
-        elif nodo.valor == '|':
-            nodo.nullable = nodo.left.nullable or nodo.right.nullable
+    def nullable(self, Rama):
+        if Rama.valor == 'ε':
+            Rama.nullable = True
+        elif is_operand(Rama.valor):
+            Rama.nullable = False
+        elif Rama.valor == '*':
+            Rama.nullable = True
+        elif Rama.valor == '.':
+            Rama.nullable = Rama.left.nullable and Rama.right.nullable
+        elif Rama.valor == '|':
+            Rama.nullable = Rama.left.nullable or Rama.right.nullable
     
-    def firstpos(self, nodo):
-        if nodo.valor == 'ε':
-            nodo.fistpos = []
-        if is_operand(nodo.valor) or nodo.valor=='#':
-            nodo.first_pos = [nodo.pos]
-        elif nodo.valor == '*':
-            nodo.first_pos = nodo.left.first_pos
-        elif nodo.valor == '.':
-            if nodo.left.nullable:
-                nodo.first_pos = nodo.left.first_pos + nodo.right.first_pos
+    def firstpos(self, Rama):
+        if Rama.valor == 'ε':
+            Rama.fistpos = []
+        if is_operand(Rama.valor) or Rama.valor=='#':
+            Rama.first_pos = [Rama.pos]
+        elif Rama.valor == '*':
+            Rama.first_pos = Rama.left.first_pos
+        elif Rama.valor == '.':
+            if Rama.left.nullable:
+                Rama.first_pos = Rama.left.first_pos + Rama.right.first_pos
             else:
-                nodo.first_pos = nodo.left.first_pos
-        elif nodo.valor == '|':
-            nodo.first_pos = nodo.left.first_pos + nodo.right.first_pos
+                Rama.first_pos = Rama.left.first_pos
+        elif Rama.valor == '|':
+            Rama.first_pos = Rama.left.first_pos + Rama.right.first_pos
 
-    def lastpos(self, nodo):
-        if nodo.valor == 'ε':
-            nodo.last_pos = []
-        if is_operand(nodo.valor) or nodo.valor=='#':
-            nodo.last_pos = [nodo.pos]
-        elif nodo.valor == '*':
-            nodo.last_pos = nodo.left.last_pos
-        elif nodo.valor == '.':
-            if nodo.right.nullable:
-                nodo.last_pos = nodo.left.last_pos + nodo.right.last_pos
+    def lastpos(self, Rama):
+        if Rama.valor == 'ε':
+            Rama.last_pos = []
+        if is_operand(Rama.valor) or Rama.valor=='#':
+            Rama.last_pos = [Rama.pos]
+        elif Rama.valor == '*':
+            Rama.last_pos = Rama.left.last_pos
+        elif Rama.valor == '.':
+            if Rama.right.nullable:
+                Rama.last_pos = Rama.left.last_pos + Rama.right.last_pos
             else:
-                nodo.last_pos = nodo.right.last_pos
-        elif nodo.valor == '|':
-            nodo.last_pos = nodo.left.last_pos + nodo.right.last_pos
+                Rama.last_pos = Rama.right.last_pos
+        elif Rama.valor == '|':
+            Rama.last_pos = Rama.left.last_pos + Rama.right.last_pos
 
     def followpos(self, raiz):
         if raiz.right:
@@ -160,7 +240,7 @@ class AFD_D(object):
                             existe = True
 
 
-                    if not existe:
+                    if not existe and temp != []:
                         estados.append({
                             'estado': 'S'+str(len(estados)),
                             'posiciones': temp,
@@ -176,39 +256,38 @@ class AFD_D(object):
                     transiciones[contador+1][letra] = temp
                     
             contador+=1
-
-        self.print_transiciones(transiciones, estados)
-
-        return None
+        return transiciones, estados
     
-    def print_transiciones(self, transiciones, estados):
-        x = PrettyTable()
-        x.field_names = ["Posiciones", "Estado"]
-        for i in range(len(self.alfabeto)):
-            x.field_names.append("Transiciones con " +self.alfabeto[i])
+    # def print_transiciones(self, transiciones, estados):
+    #     x = PrettyTable()
+    #     x.field_names = ["Posiciones", "Estado"]
+    #     for i in range(len(self.alfabeto)):
+    #         if self.alfabeto[i] != '#':
+    #             mensaje = "Transiciones con " + self.alfabeto[i]
+    #             x.field_names.append(mensaje)
     
-        for transicion in transiciones:
-            posicion = estados[transicion-1]['posiciones']
-            estado = estados[transicion-1]['estado']
+    #     for transicion in transiciones:
+    #         posicion = estados[transicion-1]['posiciones']
+    #         estado = estados[transicion-1]['estado']
 
-            temp = []
+    #         temp = []
 
-            for letra in transiciones[transicion]:
-                if letra not in temp:
-                    temp.append(letra)
+    #         for letra in transiciones[transicion]:
+    #             if letra not in temp:
+    #                 temp.append(letra)
 
-            estados_temp = []
-            for element in temp:
-                estados_temp.append(self.getEstado(estados, transiciones[transicion][element]))
+    #         estados_temp = []
+    #         for element in temp:
+    #             estados_temp.append(self.getEstado(estados, transiciones[transicion][element]))
 
             
-            lista = [posicion, estado]
-            lista.extend(estados_temp)
-            x.add_row(lista)
+    #         lista = [posicion, estado]
+    #         lista.extend(estados_temp)
+    #         x.add_row(lista)
         
-        print(x.rows)
+    #     print(x.rows)
 
-        print(x)
+    #     print(x)
 
         
         
@@ -229,23 +308,23 @@ class ConstruccionArbol(object):
     def simple(self, nombre):
         self.contador+=1
         self.followposT[self.contador]=[]
-        return Nodo(valor=nombre,pos=self.contador)
+        return Rama(valor=nombre,pos=self.contador)
     
-    def concat(self, valor, nodo1, nodo2):
-        self.ramas.append(nodo1)
-        self.ramas.append(nodo2)
-        return Nodo(valor=valor, left=nodo2, right=nodo1)
+    def concat(self, valor, Rama1, Rama2):
+        self.ramas.append(Rama1)
+        self.ramas.append(Rama2)
+        return Rama(valor=valor, left=Rama2, right=Rama1)
     
-    def orS(self, valor, nodo1, nodo2):
-        self.ramas.append(nodo1)
-        self.ramas.append(nodo2)
-        return Nodo(valor=valor, left=nodo2, right=nodo1)
+    def orS(self, valor, Rama1, Rama2):
+        self.ramas.append(Rama1)
+        self.ramas.append(Rama2)
+        return Rama(valor=valor, left=Rama2, right=Rama1)
     
-    def kleene(self, valor, nodo1):
-        self.ramas.append(nodo1)
-        return Nodo(valor=valor, left=nodo1)
+    def kleene(self, valor, Rama1):
+        self.ramas.append(Rama1)
+        return Rama(valor=valor, left=Rama1)
 
-    # implementacion parecida a thompson pero con Nodos del arbol sintactico
+    # implementacion parecida a thompson pero con Ramas del arbol sintactico
     def Arbol(self, stack):
         binarios = '|.'
         unarios = '*+'
@@ -254,54 +333,54 @@ class ConstruccionArbol(object):
         primero = stack.pop()
 
         if primero in binarios:
-            nodo1 = stack.pop()
+            Rama1 = stack.pop()
 
-            if nodo1 in operadores:
-                stack.append(nodo1)
-                nodo1 = self.Arbol(stack)
+            if Rama1 in operadores:
+                stack.append(Rama1)
+                Rama1 = self.Arbol(stack)
             
-            nodo2 = stack.pop()
+            Rama2 = stack.pop()
 
-            if nodo2 in operadores:
-                stack.append(nodo2)
-                nodo2 = self.Arbol(stack)
+            if Rama2 in operadores:
+                stack.append(Rama2)
+                Rama2 = self.Arbol(stack)
 
             '''
-                Se revirete el orden llamando primero a nodo2 para que el contador
+                Se revirete el orden llamando primero a Rama2 para que el contador
                 de posiciones sea correcto.
             '''
-            if isinstance(nodo2, str):
-                nodo2 = self.simple(nodo2)
+            if isinstance(Rama2, str):
+                Rama2 = self.simple(Rama2)
             
-            if isinstance(nodo1, str):
-                nodo1 = self.simple(nodo1)
+            if isinstance(Rama1, str):
+                Rama1 = self.simple(Rama1)
             
             
             if primero == "|":
                 
-                return self.orS(primero, nodo1, nodo2)
+                return self.orS(primero, Rama1, Rama2)
             
             elif primero == ".":
-                return self.concat(primero, nodo1, nodo2)
+                return self.concat(primero, Rama1, Rama2)
         
         elif primero in unarios:
-            nodo1 = stack.pop()
+            Rama1 = stack.pop()
 
-            if nodo1 in operadores:
-                stack.append(nodo1)
-                nodo1 = self.Arbol(stack)
+            if Rama1 in operadores:
+                stack.append(Rama1)
+                Rama1 = self.Arbol(stack)
 
-            if isinstance(nodo1, str):
-                nodo1 = self.simple(nodo1)
+            if isinstance(Rama1, str):
+                Rama1 = self.simple(Rama1)
 
             if primero == "*":
-                return self.kleene(primero, nodo1)
+                return self.kleene(primero, Rama1)
         
         else:
             return self.simple(primero)
 
 
-class Nodo(object):
+class Rama(object):
     def __init__(self, valor = None, first_pos = None, last_pos = None, follow_pos = None, nullable = None, left = None, right = None, pos = None):
         self.valor = valor
         self.first_pos = first_pos
