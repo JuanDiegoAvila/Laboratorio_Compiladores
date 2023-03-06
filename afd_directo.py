@@ -1,5 +1,5 @@
 from prettytable import PrettyTable
-from thomson import *
+from thompson import *
 
 def is_operand(char):
     return True if char.isalpha() else char.isnumeric()
@@ -45,14 +45,19 @@ class AFD_D(object):
                 estados_f.append(estado["estado"])
 
         for estado in estados:
-            numero = estado["estado"].split('S')
-            numero = int(numero[1]) + 1
-
             estado["inicial"] = False
             estado["aceptacion"] = False
-
-            if numero in finales:
+            if estado["estado"] in estados_f:
                 estado["aceptacion"] = True
+            else:
+                estado["aceptacion"] = False
+            # numero = estado["estado"].split('S')
+            # numero = int(numero[1]) + 1
+
+            
+
+            # if numero in finales:
+            #     estado["aceptacion"] = True
 
         estados[0]["inicial"] = True
                 
@@ -64,35 +69,18 @@ class AFD_D(object):
             nodo.inicial = estado["inicial"]
             nodo.final = estado["aceptacion"]
             nodos.append(nodo)
-            
-        print(estados)
+
         for nodo in nodos:
             transicion = int(nodo.conteo.split('S')[1]) +1
             for index, value in transiciones[transicion].items():
                 if value != []:
                     for estado in estados:
-                        print(estado)
-                        print(value)
-                        input()
                         if estado["posiciones"] == value:
-                            print(estado["estado"])
-                            nodos_filtrados = filter(lambda n: n.conteo == estado["estado"], nodos)
-                            
-                            # for i in nodos_filtrados:
-                            #     print(i)
-                            # input()
-                            # transicion = map(lambda n: nodo.addTransition(n, index), nodos_filtrados)
-
                             for n in nodos:
                                 if n.conteo == estado["estado"]:
-                                    print(n, n.conteo)
                                     nodo.addTransition(n, index)
-
-        # nodos = order_nodos(nodos[0])
-        for i in nodos:
-            print(i)
-            i.print_transiciones()
-
+        
+        nodos = order_nodos(nodos[0])
         return nodos
         
     def getAlfabeto(self):

@@ -1,7 +1,8 @@
 from postfix import *
-from thomson import Thomson
+from thompson import *
 from grafo import *
 from afd_directo import *
+from afd_subconjuntos import *
 
 # expresion = "0?(1?)?0?"
 # expresion = "ab"
@@ -22,7 +23,8 @@ while not salir:
     print("Ingrese la opcion que desea realizar: ")
     print("\t[ 1 ] Convertir una expresion regular a AFN")
     print("\t[ 2 ] Convertir una expresion regular a AFD de forma directa")
-    print("\t[ 3 ] Salir")
+    print("\t[ 3 ] Convertir AFN a AFD por sub conjuntos")
+    print("\t[ 4 ] Salir")
     opcion = input("-> ")
     print("\n==========================================================================================\n")
 
@@ -35,8 +37,8 @@ while not salir:
         expresion = postfix.final
 
         # Se aplica el algoritmo de thomspon para crear el afn.
-        thomson = Thomson(expresion)
-        nodos = thomson.visitados
+        thompson = Thompson(expresion)
+        nodos = thompson.visitados
 
         # Se crea el grafo con los nodos del afn.
         grafo = Grafo(nodos)
@@ -49,13 +51,26 @@ while not salir:
         postfix.toPostfix()
         expresion = postfix.final
 
-
+        # Se crea el AFD a partir de la expresion regular
         afd = AFD_D(expresion)
         grafo = Grafo(afd.nodos)
 
 
-        pass
-
     elif opcion == '3':
+
+        expresion = input("\n Ingrese la expresion regular que sera convertida a AFN -> ")
+
+        # Se hace la conversion de la expresion regular a postfix.
+        postfix = Postfix(expresion)
+        postfix.toPostfix()
+        expresion = postfix.final
+
+        # Se aplica el algoritmo de thomspon para crear el afn.
+        thompson = Thompson(expresion)
+
+        # Se convierte el AFN a un AFD 
+        afd = Subconjuntos(thompson)
+
+    elif opcion == '4':
         salir = True
 

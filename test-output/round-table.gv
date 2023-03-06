@@ -3,5 +3,7 @@ digraph {
 	inicio [label="" shape=none]
 	S0
 	inicio -> S0
-	S1
+	S0 [peripheries=2]
+	S0 -> S1 [label=a]
+	S1 [peripheries=2]
 }

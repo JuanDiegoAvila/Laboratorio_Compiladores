@@ -14,7 +14,7 @@ class Grafo(object):
                 G.node('inicio', shape='none', label='')
                 G.node(str(nodo.conteo))
                 G.edge('inicio', str(nodo.conteo))
-            elif nodo.final:
+            if nodo.final:
                 G.node(str(nodo.conteo), peripheries = '2')
             else:
                 G.node(str(nodo.conteo))

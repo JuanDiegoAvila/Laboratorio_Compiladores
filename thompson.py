@@ -2,23 +2,27 @@ from collections import deque
 from grafo import *
 from prettytable import PrettyTable
 
-class Thomson(object):
+class Thompson(object):
     def __init__(self, postfix):
         self.postfix = postfix
         self.conteo_nodos = 0
         self.nodos = []
-        self.inicio, self.final = self.thomson(([*postfix]))
+        self.inicio, self.final = self.thompson(([*postfix]))
         self.inicio.inicial = True
         self.final.final = True
         self.visitados = self.order_nodos(self.inicio)
 
     def order_nodos(self, first_node):
+        conteo_nodos = 0
+        first_node.conteo = conteo_nodos
         visitados = {first_node}
         queue = deque([first_node])
         nodos_ordenados = []
 
         while queue:
+            conteo_nodos += 1
             nodo = queue.popleft()
+            nodo.conteo = conteo_nodos
             nodos_ordenados.append(nodo)
 
             for s_nodo, valor in nodo.transicion.items():
@@ -29,7 +33,7 @@ class Thomson(object):
         return nodos_ordenados
 
     
-    def thomson(self, stack):
+    def thompson(self, stack):
         binarios = '|.'
         unarios = '*+'
         operadores = '|.*+'
@@ -41,13 +45,13 @@ class Thomson(object):
 
             if nodo1 in operadores:
                 stack.append(nodo1)
-                nodo1 = self.thomson(stack)
+                nodo1 = self.thompson(stack)
             
             nodo2 = stack.pop()
 
             if nodo2 in operadores:
                 stack.append(nodo2)
-                nodo2 = self.thomson(stack)
+                nodo2 = self.thompson(stack)
 
             
             if isinstance(nodo1, str):
@@ -78,7 +82,7 @@ class Thomson(object):
 
             if nodo1 in operadores:
                 stack.append(nodo1)
-                nodo1 = self.thomson(stack)
+                nodo1 = self.thompson(stack)
 
             if isinstance(nodo1, str):
                 nodo1 = self.simple(nodo1)
@@ -98,23 +102,17 @@ class Thomson(object):
             
     def concat(self, nodo1i, nodo1f, nodo2i, nodo2f):
         inicio = nodo2f
-        self.conteo_nodos += 1
         final = nodo1i
-        self.conteo_nodos += 1
 
         inicio.addTransition(final, "ε")
 
         return [nodo2i, nodo1f]
 
     def kleene(self, nodo1i, nodo1f):
-        inicio = Nodo(self.conteo_nodos, False, False, {})
-        self.conteo_nodos += 1
+        inicio = Nodo(0, False, False, {})
         n1 = nodo1i
-        self.conteo_nodos += 1
         n2 = nodo1f
-        self.conteo_nodos += 1
-        final = Nodo(self.conteo_nodos, False, False, {})
-        self.conteo_nodos += 1
+        final = Nodo(0, False, False, {})
 
         inicio.addTransition(final, "ε")
         inicio.addTransition(n1, "ε")
@@ -126,18 +124,12 @@ class Thomson(object):
         return [inicio, final]
     
     def orS(self, nodo1i, nodo1f, nodo2i, nodo2f):
-        inicio = Nodo(self.conteo_nodos, False, False, {})
-        self.conteo_nodos += 1
+        inicio = Nodo(0, False, False, {})
         n1 = nodo2i
-        self.conteo_nodos += 1
         n2 = nodo2f
-        self.conteo_nodos += 1
         n3 = nodo1i
-        self.conteo_nodos += 1
         n4 = nodo1f
-        self.conteo_nodos += 1
-        final = Nodo(self.conteo_nodos, False, False, {})
-        self.conteo_nodos += 1
+        final = Nodo(0, False, False, {})
 
         inicio.addTransition(n1, "ε")
         inicio.addTransition(n3, "ε")
@@ -150,14 +142,10 @@ class Thomson(object):
         return [inicio, final]
     
     def positiva(self, nodo1i, nodo1f):
-        inicio = Nodo(self.conteo_nodos, False, False, {})
-        self.conteo_nodos += 1
+        inicio = Nodo(0, False, False, {})
         n1 = nodo1i
-        self.conteo_nodos += 1
         n2 = nodo1f
-        self.conteo_nodos += 1
-        final = Nodo(self.conteo_nodos, False, False, {})
-        self.conteo_nodos += 1
+        final = Nodo(0, False, False, {})
 
         inicio.addTransition(n1, "ε")
         n2.addTransition(n1, "ε")
@@ -168,10 +156,8 @@ class Thomson(object):
         return [inicio, final]
 
     def simple(self, valor):
-        inicio = Nodo(self.conteo_nodos, False, False, {})
-        self.conteo_nodos += 1
-        final = Nodo(self.conteo_nodos, False, False, {})
-        self.conteo_nodos += 1
+        inicio = Nodo(0, False, False, {})
+        final = Nodo(0, False, False, {})
         inicio.addTransition(final, valor)
 
         self.nodos.append(inicio)
@@ -182,11 +168,11 @@ class Thomson(object):
 
 
 class Nodo(object):
-    def __init__(self, conteo, inicial = False, final = False, transicion = {}):
+    def __init__(self, conteo, inicial = False, final = False, transicion = None):
         self.conteo = conteo
         self.final = final
         self.inicial = inicial
-        self.transicion = transicion
+        self.transicion = transicion if transicion is not None else {}
     
     def addTransition(self, nodo, valor):
         if nodo in self.transicion.keys() :
@@ -202,7 +188,12 @@ class Nodo(object):
             print(self.conteo, " -> ", nodo.conteo, " : ", self.transicion[nodo])
     
     def __repr__(self):
-        return str(self.conteo)
+        
+        index, value = self.transicion.keys()
+        x = PrettyTable()
+        x.field_names = ["Nodo", "Inicial", "Final", "Transiciones"]
+        x.add_row([self.conteo, self.inicial, self.final, index])
+        return str(x)+'\n'
 
     def __str__(self):
         return str(self.conteo)
