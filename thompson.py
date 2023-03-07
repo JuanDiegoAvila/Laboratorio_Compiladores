@@ -2,6 +2,8 @@ from collections import deque
 from grafo import *
 from prettytable import PrettyTable
 
+
+
 class Thompson(object):
     def __init__(self, postfix):
         self.postfix = postfix
@@ -11,6 +13,17 @@ class Thompson(object):
         self.inicio.inicial = True
         self.final.final = True
         self.visitados = self.order_nodos(self.inicio)
+        self.alfabeto = self.getAlfabeto()
+
+    def getAlfabeto(self):
+        alfabeto = []
+        for char in self.postfix:
+            if self.is_operand(char) and char not in alfabeto and char!='ε':
+                alfabeto.append(char)
+        return alfabeto
+    
+    def is_operand(self, char):
+        return True if char.isalpha() else char.isnumeric()
 
     def order_nodos(self, first_node):
         conteo_nodos = 0
@@ -175,6 +188,7 @@ class Nodo(object):
         self.transicion = transicion if transicion is not None else {}
     
     def addTransition(self, nodo, valor):
+        
         if nodo in self.transicion.keys() :
             self.transicion[nodo].append(valor)
         else:
@@ -188,12 +202,27 @@ class Nodo(object):
             print(self.conteo, " -> ", nodo.conteo, " : ", self.transicion[nodo])
     
     def __repr__(self):
-        
-        index, value = self.transicion.keys()
+        transiciones = []
+        for nodo in self.transicion.keys():
+            transiciones.append(str(nodo.conteo)+" -> "+str(self.transicion[nodo]))
+        index = ", ".join(transiciones)
+
+
         x = PrettyTable()
         x.field_names = ["Nodo", "Inicial", "Final", "Transiciones"]
         x.add_row([self.conteo, self.inicial, self.final, index])
-        return str(x)+'\n'
+        return '\n'+str(x)+'\n'
 
     def __str__(self):
-        return str(self.conteo)
+        transiciones = []
+        for nodo in self.transicion.keys():
+            transiciones.append(str(nodo.conteo)+" -> "+str(self.transicion[nodo]))
+        index = ", ".join(transiciones)
+
+
+        x = PrettyTable()
+        x.field_names = ["Nodo", "Inicial", "Final", "Transiciones"]
+        x.add_row([self.conteo, self.inicial, self.final, index])
+        return '\n'+str(x)+'\n'
+    
+

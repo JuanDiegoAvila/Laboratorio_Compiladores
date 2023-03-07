@@ -1,9 +1,11 @@
 digraph {
 	graph [rankdir=LR]
 	inicio [label="" shape=none]
-	S0
-	inicio -> S0
-	S0 [peripheries=2]
-	S0 -> S1 [label=a]
-	S1 [peripheries=2]
+	1
+	inicio -> 1
+	1
+	1 -> 2 [label=a]
+	1 -> 3 [label=b]
+	2 [peripheries=2]
+	3 [peripheries=2]
 }

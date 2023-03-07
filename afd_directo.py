@@ -69,7 +69,7 @@ class AFD_D(object):
             nodo.inicial = estado["inicial"]
             nodo.final = estado["aceptacion"]
             nodos.append(nodo)
-
+        
         for nodo in nodos:
             transicion = int(nodo.conteo.split('S')[1]) +1
             for index, value in transiciones[transicion].items():
