@@ -98,7 +98,14 @@ while not salir:
 
         expresion = input("\n Ingrese la expresion que sera evaluada por el AFN -> ")
 
-        simulacion = Simulacion(nodos,alfabeto,expresion)
+        simulacion = Simulacion(nodos,alfabeto,expresion, "AFN")
+
+        if(simulacion.aceptado):
+            print("\n\tLa expresion es aceptada por el AFN. Los movimientos realizados son los siguientes:")
+            movimientos = simulacion.movimientos
+            print(movimientos)
+        else:
+            print("\n\tLa expresion no es aceptada por el AFN")
 
 
     elif opcion == '5':
@@ -119,7 +126,14 @@ while not salir:
 
         expresion = input("\n Ingrese la expresion que sera evaluada por el AFD -> ")
 
-        simulacion = Simulacion(nodos,alfabeto,expresion)
+        simulacion = Simulacion(nodos,alfabeto,expresion, "AFD")
+
+        if(simulacion.aceptado):
+            print("\n\tLa expresion es aceptada por el AFD. Los movimientos realizados son los siguientes:")
+            movimientos = simulacion.movimientos
+            print(movimientos)
+        else:
+            print("\n\tLa expresion no es aceptada por el AFD")
 
     
     elif opcion == '6':

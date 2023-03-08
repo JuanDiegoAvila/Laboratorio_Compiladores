@@ -196,6 +196,11 @@ class Nodo(object):
 
     def get_transition(self, nodo):
         return self.transicion[nodo]
+    
+    def get_transition_valor(self, valor):
+        for nodo in self.transicion.keys():
+            if valor in self.transicion[nodo]:
+                return nodo
 
     def print_transiciones(self):
         for nodo in self.transicion.keys():

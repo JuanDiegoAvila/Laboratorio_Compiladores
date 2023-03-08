@@ -60,8 +60,6 @@ class Subconjuntos(object):
                         actual = nodo
                 for nodo in nodos:
                     if nodo.conteo == transiciones[transicion][simbolo]:
-                        print(transicion)
-                        print(simbolo)
                         actual.addTransition(nodo, simbolo)
 
         return nodos
