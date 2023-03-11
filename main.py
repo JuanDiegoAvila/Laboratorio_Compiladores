@@ -34,10 +34,10 @@ while not salir:
 
 
     if opcion == '1':
-        expresion = input("\n Ingrese la expresion regular que sera convertida a AFN -> ")
+        expresiono = input("\n Ingrese la expresion regular que sera convertida a AFN -> ")
 
         # Se hace la conversion de la expresion regular a postfix.
-        postfix = Postfix(expresion)
+        postfix = Postfix(expresiono)
         postfix.toPostfix()
         expresion = postfix.final
 
@@ -45,12 +45,18 @@ while not salir:
         thompson = Thompson(expresion)
         nodos = thompson.visitados
 
+
         # Se crea el grafo con los nodos del afn.
         grafo = Grafo(nodos, nombre = "expresion_a_AFN")
 
         print("\n==========================================================================================\n")
         print('\n\t AFN creado con exito.\n')
         print("\n==========================================================================================\n")
+
+        
+        postfix = Postfix(expresiono, True)
+        postfix.toPostfix()
+        expresion = postfix.final
 
         # Se hace la construccion directa de el AFD a partir de la expresion regular
         afd = AFD_D(expresion)

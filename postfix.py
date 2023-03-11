@@ -6,9 +6,13 @@ def check_expresion(expresion):
     return postfix.concat_expression(expresion)
 
 def postive_format(expresion):
+
     expresion = ([*expresion])
+    print(expresion)
+    nueva_expresion = []
 
     for char in range(len(expresion)):
+
 
         if expresion[char] == '+':
             prev_char = expresion[char-1]
@@ -23,17 +27,23 @@ def postive_format(expresion):
                         temp.append(')')
                         temp.append('*')
 
-                        expresion.remove(expresion[char])
-                        expresion[char:len(temp)+char] = temp
+                        # # expresion.remove(expresion[char])
+                        # expresion[char:len(temp)+char] = temp
                         # expresion.extend(temp)
                         break
                     else:
                         temp.append(expresion[i])
                     i -= 1
+                nueva_expresion.extend(temp)
             else:
-                expresion[char] = prev_char + '*'
+                # expresion[char] = prev_char + '*'
+                temp = [prev_char, '*']
+                nueva_expresion.append(temp)
 
-    return ''.join(expresion)
+        else:
+            nueva_expresion.append(expresion[char])
+    print(nueva_expresion)
+    return ''.join(nueva_expresion)
 
 
 class Postfix():
