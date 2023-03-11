@@ -3,7 +3,8 @@ import graphviz as gv
 import matplotlib.pyplot as plt
 
 class Grafo(object):
-    def __init__(self, nodos):
+    def __init__(self, nodos, nombre = "round-table"):
+        self.nombre = "test-output/" + nombre + ".gv"
         self.nodos = nodos
         self.grafo_graphviz()
         
@@ -23,4 +24,4 @@ class Grafo(object):
                 for values in nodo.transicion[key]:
                     G.edge(str(nodo.conteo), str(key.conteo), label= str(values))  
                 
-        G.render('test-output/round-table.gv', view=True)
+        G.render(self.nombre, view=True)

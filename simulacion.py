@@ -57,14 +57,11 @@ class Simulacion(object):
         expresion.append('#') # Se agrega el simbolo de fin de cadena
 
         S = self.e_closure(self.nodos[0])
-
         c = self.sigCar(expresion)
 
         while (c != '#'):
-
             move = self.move(S, c)
             S = self.e_closure(move)
-
             c = self.sigCar(expresion)
 
         movimientos = ""

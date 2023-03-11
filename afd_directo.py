@@ -34,6 +34,7 @@ class AFD_D(object):
 
     
     def iniciales_finales(self, estados):
+
         finales = []
         for follow in self.followposT:
             if len(self.followposT) in self.followposT[follow]:
@@ -51,13 +52,6 @@ class AFD_D(object):
                 estado["aceptacion"] = True
             else:
                 estado["aceptacion"] = False
-            # numero = estado["estado"].split('S')
-            # numero = int(numero[1]) + 1
-
-            
-
-            # if numero in finales:
-            #     estado["aceptacion"] = True
 
         estados[0]["inicial"] = True
                 
@@ -91,7 +85,6 @@ class AFD_D(object):
         return alfabeto
 
     def construccion_directa(self):
-
         # se construye el arbol sintactico
         arbol = ConstruccionArbol()
         ramasRaiz = arbol.Arbol(self.expresion)
@@ -105,16 +98,15 @@ class AFD_D(object):
                 self.firstpos(rama)
             if rama.last_pos == None:
                 self.lastpos(rama)
-
         self.followpos(ramas[len(ramas)-1])
         self.followposT = {k: v for k, v in sorted(self.followposT.items(), key=lambda item: item[0])}
-
+        
         return self.tabla_transiciones(ramas)
 
     def nullable(self, Rama):
         if Rama.valor == 'ε':
             Rama.nullable = True
-        elif is_operand(Rama.valor):
+        elif is_operand(Rama.valor) or Rama.valor=='#':
             Rama.nullable = False
         elif Rama.valor == '*':
             Rama.nullable = True
@@ -172,7 +164,7 @@ class AFD_D(object):
                         self.followposT[i].sort()
         
         elif raiz.valor == '*':
-            for i in raiz.last_pos:
+            for i in raiz.left.last_pos:
                 if i not in self.followposT:
                     self.followposT[i] = []
 
@@ -219,9 +211,12 @@ class AFD_D(object):
                     for element in temp_estado['posiciones']:
                         for rama in ramas:
                             if letra == rama.valor and element == rama.pos:
-                                temp.extend(self.followposT[element])
+                                elements = self.followposT[element]
+                                for e in elements:
+                                    if e not in temp:
+                                        temp.append(e)
+                                        temp.sort()
                                 temp.sort()
-                    
                     existe = False
                     for estado in estados:
                         if estado['posiciones'] == temp:
@@ -366,6 +361,28 @@ class ConstruccionArbol(object):
         
         else:
             return self.simple(primero)
+    
+    def ordenar_arbol(self, first_rama):
+        conteo_ramas = 0
+        visitados = {first_rama}
+        queue = deque([first_rama])
+        ramas_ordenadas = []
+
+        while queue:
+            rama = queue.popleft()
+            ramas_ordenadas.append(rama)
+            if rama.left and rama.left not in visitados:
+                queue.append(rama.left)
+                visitados.add(rama.left)
+            if rama.right and rama.right not in visitados:
+                queue.append(rama.right)
+                visitados.add(rama.right)
+            
+        return ramas_ordenadas
+
+    def imprimir_arbol(self):
+        for rama in self.ramas:
+            print(rama)
 
 
 class Rama(object):
@@ -392,7 +409,10 @@ class Rama(object):
         return self.follow_pos
 
     def __str__(self):
-        return str(self.valor)
+        x = PrettyTable()
+        x.field_names = ["Valor", "FirstPos", "LastPos", "FollowPos", "Nullable"]
+        x.add_row([self.valor, self.first_pos, self.last_pos, self.follow_pos, self.nullable])
+        return x.get_string()+'\n\n'
     
     def __repr__(self):
         x = PrettyTable()
