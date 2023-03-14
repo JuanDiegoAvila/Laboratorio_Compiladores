@@ -10,6 +10,8 @@ def postive_format(expresion):
     expresion = ([*expresion])
     print(expresion)
     nueva_expresion = []
+    conteo_par_izq = 0
+    conteo_par_der = 0
 
     for char in range(len(expresion)):
 
@@ -17,28 +19,39 @@ def postive_format(expresion):
         if expresion[char] == '+':
             prev_char = expresion[char-1]
             if prev_char == ')':
+
+                conteo_par_der += 1
+
                 i = char-2
                 temp = []
                 while i >= 0:
+                    if expresion[i] == ')':
+                        conteo_par_der += 1
                     if expresion[i] == '(':
-                        temp = reversed(temp)
-                        temp = list(temp)
-                        temp.insert(0, '(')
-                        temp.append(')')
-                        temp.append('*')
+                        conteo_par_izq += 1
 
-                        # # expresion.remove(expresion[char])
-                        # expresion[char:len(temp)+char] = temp
-                        # expresion.extend(temp)
-                        break
+                        if conteo_par_izq == conteo_par_der:
+                            
+                            # temp.append(expresion[i])
+                            temp = reversed(temp)
+                            temp = list(temp)
+                            temp.insert(0, '(')
+                            temp.append(')')
+                            temp.append('*')
+
+                            break
+                        else:
+                            temp.append(expresion[i])
+
                     else:
                         temp.append(expresion[i])
                     i -= 1
+                
                 nueva_expresion.extend(temp)
             else:
                 # expresion[char] = prev_char + '*'
                 temp = [prev_char, '*']
-                nueva_expresion.append(temp)
+                nueva_expresion.extend(temp)
 
         else:
             nueva_expresion.append(expresion[char])
