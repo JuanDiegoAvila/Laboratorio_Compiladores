@@ -1,5 +1,5 @@
 from collections import deque
-from grafo import *
+from Automatas.grafo import *
 from prettytable import PrettyTable
 
 
@@ -9,11 +9,36 @@ class Thompson(object):
         self.postfix = postfix
         self.conteo_nodos = 0
         self.nodos = []
-        self.inicio, self.final = self.thompson(([*postfix]))
+
+        expresion_separada = self.deconstruct_expresion(postfix)
+        print(expresion_separada, "Exp resume")
+        self.inicio, self.final = self.thompson(expresion_separada)
         self.inicio.inicial = True
         self.final.final = True
         self.visitados = self.order_nodos(self.inicio)
         self.alfabeto = self.getAlfabeto()
+
+    def deconstruct_expresion(self, expresion):
+        temp_expresion = ([*expresion])
+        stack = []
+        es_comilla = False
+        temp = []
+    
+        for i in range(len(temp_expresion)):
+            if temp_expresion[i] == "'":
+                es_comilla = not es_comilla
+                temp.append(temp_expresion[i])
+
+                if not es_comilla:
+                    stack.append("".join(temp))
+                    temp = []
+
+            elif es_comilla:
+                temp.append(temp_expresion[i])
+            else:
+                stack.append(temp_expresion[i])
+        return stack
+
 
     def getAlfabeto(self):
         alfabeto = []
