@@ -2,7 +2,24 @@ from collections import deque
 from Automatas.grafo import *
 from prettytable import PrettyTable
 
+def order_nodos(first_node):
+    conteo_nodos = 0
+    first_node.conteo = conteo_nodos
+    visitados = {first_node}
+    queue = deque([first_node])
+    nodos_ordenados = []
 
+    while queue:
+        conteo_nodos += 1
+        nodo = queue.popleft()
+        nodo.conteo = conteo_nodos
+        nodos_ordenados.append(nodo)
+
+        for s_nodo, valor in nodo.transicion.items():
+            if s_nodo not in visitados:
+                visitados.add(s_nodo)
+                queue.append(s_nodo)
+    return nodos_ordenados
 
 class Thompson(object):
     def __init__(self, postfix):
@@ -11,7 +28,6 @@ class Thompson(object):
         self.nodos = []
 
         expresion_separada = self.deconstruct_expresion(postfix)
-        print(expresion_separada, "Exp resume")
         self.inicio, self.final = self.thompson(expresion_separada)
         self.inicio.inicial = True
         self.final.final = True
