@@ -1,0 +1,16 @@
+(* Lexer para Gramática No. 4 *)
+
+(* Introducir cualquier header aqui *)
+
+
+let digit = ['0'-'9']
+let letter = ['a'-'z']
+let number = ['1'-'5']
+let metacaracteres = ('*' | '+' | '?' | '|' | '(' | ')' | '.')
+rule tokens = 
+    digit {}
+  | letter {}
+  | number {}
+  | metacaracteres {}
+
+(* Introducir cualquier trailer aqui *)

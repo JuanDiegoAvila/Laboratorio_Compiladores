@@ -5,7 +5,7 @@ from Automatas.thompson import *
 
 # Path al archivo YALex
 
-path = "./Yalex/ejemplo.txt"
+path = "./Yalex/lexer3.txt"
 
 YALEX = Yalex(path)
 
@@ -38,7 +38,6 @@ final = Nodo('f', False, True, {})
 for automata in automatas:
     # Crear una transicion del nodo inicial al primer nodo del automata
     inicial.addTransition(automata[0], "ε")
-
     # Buscar el elemento sin transicion del automata
     for nodo in automata:
         if nodo.transicion == {}:

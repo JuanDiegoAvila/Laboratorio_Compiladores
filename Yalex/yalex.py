@@ -5,14 +5,68 @@ class Yalex(object):
         self.tokens = {}
         self.getTokens()
         self.parseTokens()
+        self.check_error()
+
+    def check_error(self):
+        # Definimos una lista de palabras clave 
+        keywords = ["let", "in", "if", "then", "else", "match", "with", "fun", "function", "try", "raise", "exception", "open", "module", "type", "mutable", "rec", "and", "rule"]
+
+        with open(self.path, "r") as f:
+            lines = f.readlines()
+
+        in_rule = False
+        for linea in lines:
+            words = linea.split()
+
+            # Eliminar lineas vacias
+            stripped_line = linea.strip()
+
+            # Verificamos si la cadena resultante es una cadena vacía
+            if not stripped_line:
+                continue
+
+            # Si la linea empieza con (* y termina con *) entonces es un comentario
+            pattern = r"^\(\*.*\*\)$"
+            match = re.match(pattern, linea)
+
+            if match:
+                continue
+
+            # La linea debe iniciar con un keyword
+            if words[0] not in keywords and not in_rule:
+                raise Exception("Error: La linea debe iniciar con un keyword")
+            
+            if words[0] == "rule":
+                in_rule = True
+                
+            # La linea debe tener un '='
+            if words[0] == 'let' and "=" != words[2]:
+                raise Exception("Error: La linea debe tener un '='")
+
+            # No puede haber el simbolo " si la linea empieza con let
+            if '"' in linea and linea.startswith('let'):
+                raise Exception("Error: No puede haber el simbolo \"")
+            
+            temp_string = "###"
+            pattern = r"'(?:[^'\\]|\\.)*'"  # Expresión regular para encontrar subcadenas entre comillas simples
+            linea = re.sub(pattern, temp_string, linea)
+
+            # Los simbolos {}, [] y () deben estar balanceados
+            if linea.count("{") != linea.count("}"):
+                raise Exception("Error: Los simbolos {} deben estar balanceados")
+                
+            if linea.count("[") != linea.count("]"):
+                raise Exception("Error: Los simbolos [] deben estar balanceados")
+
+           
+            if linea.count("(") != linea.count(")"):
+                raise Exception("Error: Los simbolos () deben estar balanceados")
+                
 
     def getTokens(self):
         with open(self.path, 'r') as file:
             for line in file:
-                # si la linea empieza con let, es un token
-
-                if line[0] == '#':
-                    continue
+                # si la linea empieza con let, es un token\
 
                 if line.startswith("let"):
                     # tomar la linea sin la palabra inicial let
