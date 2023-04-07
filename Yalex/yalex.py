@@ -3,9 +3,9 @@ class Yalex(object):
     def __init__(self, path):
         self.path = path
         self.tokens = {}
+        self.check_error()
         self.getTokens()
         self.parseTokens()
-        self.check_error()
 
     def check_error(self):
         # Definimos una lista de palabras clave 
@@ -24,6 +24,10 @@ class Yalex(object):
             # Verificamos si la cadena resultante es una cadena vacía
             if not stripped_line:
                 continue
+
+            # Si hay dos keywords en la cadena hay error
+            if words[0] in keywords and words[1] in keywords:
+                raise Exception("Error: El nombre no puede ser una palabra reservada")
 
             # Si la linea empieza con (* y termina con *) entonces es un comentario
             pattern = r"^\(\*.*\*\)$"

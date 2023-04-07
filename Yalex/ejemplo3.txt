@@ -3,11 +3,11 @@
 (* Introducir cualquier header aqui *)
 
 
-let digit = ['0'-'9']
+let digit  = ['0'-'9']
 let letter = ['a'-'z']
 let number = ['1'-'5']
 let metacaracteres = ('*' | '+' | '?' | '|' | '(' | ')' | '.')
-rule tokens = 
+rule tokens =
     digit {}
   | letter {}
   | number {}

@@ -5,7 +5,7 @@ from Automatas.thompson import *
 
 # Path al archivo YALex
 
-path = "./Yalex/lexer3.txt"
+path = "./Yalex/ejemplo3.txt"
 
 YALEX = Yalex(path)
 
