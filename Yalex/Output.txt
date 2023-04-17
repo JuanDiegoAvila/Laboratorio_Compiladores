@@ -1,0 +1,5 @@
+identificador
+Error léxico en la línea 1, posicion 2: token no reconocido
+numero
+Error léxico en la línea 2, posicion 1: token no reconocido
+numero

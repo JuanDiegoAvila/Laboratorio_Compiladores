@@ -1,14 +1,15 @@
 from collections import deque
 
 class Simulacion(object):
-    def __init__(self, nodos, alfabeto, expresion, tipo):
+    def __init__(self, nodos, alfabeto = None, expresion = None, tipo = None):
         self.expresion = expresion
         self.nodos = nodos
         self.alfabeto = alfabeto
 
         self.contador = 0
         self.visitados = self.crearVisitados(nodos)
-        self.aceptado, self.movimientos = self.simulacionAFN() if tipo == "AFN" else self.simulacionAFD()
+        if tipo:
+            self.aceptado, self.movimientos = self.simulacionAFN() if tipo == "AFN" else self.simulacionAFD()
 
     def crearVisitados(self, nodos):
         visitados = {}
@@ -52,7 +53,6 @@ class Simulacion(object):
     
 
     def simulacionAFN(self):
-        
         expresion = [caracter for caracter in self.expresion]
         expresion.append('#') # Se agrega el simbolo de fin de cadena
 
@@ -74,7 +74,48 @@ class Simulacion(object):
             if s.final:
                 return True, movimientos
         return False, movimientos
+    
+    def move_mega_automata(self, nodos, simbolo):
+        nodos = [nodos] if type(nodos) != list else nodos
+        n_nodos = []
+        simbolos_aceptados = []
 
+        for nodo in nodos:
+            for s_nodo, valor in nodo.transicion.items():
+                simbolo = [simbolo] if type(simbolo) != list else simbolo
+                if valor == simbolo:
+                    simbolos_aceptados.append(simbolo)
+                    self.visitados[s_nodo] = True
+                    n_nodos.append(s_nodo)
+
+        return n_nodos, simbolos_aceptados
+    
+    def simulacionAFN_YALEX(self, expresion):
+        self.contador = 0
+        expresion = [caracter for caracter in expresion]
+        expresion.append('#') # Se agrega el simbolo de fin de cadena
+
+        S = self.e_closure(self.nodos[0])
+        c = self.sigCar(expresion)
+
+        simbolos_aceptados = []
+
+        while (c != '#'):
+            move, aceptados = self.move_mega_automata(S, c)
+            S = self.e_closure(move)
+            c = self.sigCar(expresion)
+            simbolos_aceptados.append(aceptados)
+
+        reconocidos = []
+        for s in S:
+            if s.final_yalex:
+                reconocidos.append(s.valor_diccionario)
+            
+
+        if len(reconocidos) > 0:
+            return True, reconocidos
+        else:
+            return False, False
 
 
     def simulacionAFD(self):

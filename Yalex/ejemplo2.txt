@@ -1,5 +1,3 @@
-(* Lexer para Gramática No. 3 - Variación expresiones aritméticas simples *)
-
 (* Introducir cualquier header aqui *)
 
 let delim = (' ' | ' \t' | '\n')

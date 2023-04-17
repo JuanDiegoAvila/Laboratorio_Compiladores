@@ -2,7 +2,12 @@ import re
 class Yalex(object):
     def __init__(self, path):
         self.path = path
+        self.header = None
+        self.trailer = None
         self.tokens = {}
+        self.rules = {}
+        self.getRules()
+        self.getHeaderTrailer()
         self.check_error()
         self.getTokens()
         self.parseTokens()
@@ -65,7 +70,50 @@ class Yalex(object):
            
             if linea.count("(") != linea.count(")"):
                 raise Exception("Error: Los simbolos () deben estar balanceados")
-                
+
+    def getRules(self):
+        is_rule = False
+        # leer el archivo con encoding utf-8
+        with open(self.path, 'r', encoding='utf-8') as file:
+            for line in file:
+                if line.startswith("rule"):
+                    is_rule = True
+                    continue
+
+                # Si es salto de linea terminar
+                if line == "\n" and is_rule:
+                    break
+
+                if is_rule:
+                    # El formato es | nombre { valor }
+
+                    # Eliminar doble espacio o mas
+                    line = re.sub(r'\s+', ' ', line)
+                    line = line.replace(" | ", "")
+
+                    is_value = False
+                    temp_value = ""
+                    temp_key = ""
+                    for element in line:
+                        if element == "{":
+                            is_value = True
+                            continue
+
+                        if element == "}":
+                            is_value = False
+                            continue
+
+                        if is_value:
+                            temp_value += element
+                        else:
+                            temp_key += element
+
+                    temp_key = temp_key.replace(" ", "")
+                    temp_key = temp_key.replace("'", "")
+                    temp_value = temp_value.replace(" print(\"", "").replace("\\n\")", "")
+                    # agregar el token y su valor a la lista de tokens
+                    self.rules[temp_key] = temp_value
+
 
     def getTokens(self):
         with open(self.path, 'r') as file:
@@ -81,14 +129,15 @@ class Yalex(object):
 
                     # eliminar espacios y el salto de linea en el valor
                     value = value.replace("\n", "")
+                    
                     # si empieza con espacio eliminarlo
                     if value.startswith(" "):
                         value = value[1:]
                     token = token.replace(" ", "")
+                    
                     # agregar el token y su valor a la lista de tokens
                     self.tokens[token] = value
-        print(self.tokens)
-    
+
     def parseTokens(self):
         # Si el token tiene la forma ['0' - '9'] entonces poner de la forma '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
         
@@ -131,6 +180,20 @@ class Yalex(object):
             for token2 in self.tokens:
                 if token != token2:
                     self.tokens[token] = self.tokens[token].replace(token2, '('+self.tokens[token2]+')')
+
+    def getHeaderTrailer(self):
+        header = False
+        with open(self.path, 'r', encoding='utf-8') as file:
+            for line in file:
+                if line.startswith("(*") and not header:
+                    header = True
+                    self.header = line
+                    continue
+
+                if line.startswith("(*") and header:
+                    self.trailer = line
+
+        
 
         
 
