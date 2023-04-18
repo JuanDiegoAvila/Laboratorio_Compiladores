@@ -22,6 +22,6 @@ class Grafo(object):
 
             for key in nodo.transicion.keys():
                 for values in nodo.transicion[key]:
-                    G.edge(str(nodo.conteo), str(key.conteo), label= str(values))  
+                    G.edge(str(nodo.conteo), str(key.conteo), label= repr(values))  
                 
         G.render(self.nombre, view=True)

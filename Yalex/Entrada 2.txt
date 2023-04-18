@@ -1,8 +1,1 @@
-var @ -4
-2var 1
-
-/*
-Salida:
-Error léxico en la línea 1, posición 5: caracter no válido.
-Error léxico en la línea 2, posición 1: token no reconocido
-*/
+var -4

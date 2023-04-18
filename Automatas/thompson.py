@@ -212,7 +212,15 @@ class Thompson(object):
     def simple(self, valor):
         inicio = Nodo(0, False, False, {})
         final = Nodo(0, False, False, {})
+
+        
+        if valor == '\t':
+            valor = '\\t'
+        elif valor == '\n':
+            valor = '\\n'
+
         valor = valor.replace("'", "")
+
         inicio.addTransition(final, valor)
 
         self.nodos.append(inicio)
@@ -230,6 +238,7 @@ class Nodo(object):
         self.transicion = transicion if transicion is not None else {}
         self.final_yalex = False
         self.valor_diccionario = ""
+        self.prioridad = 0
     
     def addTransition(self, nodo, valor):
         

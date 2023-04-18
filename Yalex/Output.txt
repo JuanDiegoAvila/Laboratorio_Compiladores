@@ -1,5 +1,12 @@
-identificador
-Error léxico en la línea 1, posicion 2: token no reconocido
-numero
-Error léxico en la línea 2, posicion 1: token no reconocido
-numero
+Identificador 
+Operador de suma 
+Número 
+Operador de multiplicación 
+Número 
+Operador de asignación 
+Identificador 
+Operador de suma 
+Número 
+Identificador 
+Error: '!' es un token que no existe
+Identificador 

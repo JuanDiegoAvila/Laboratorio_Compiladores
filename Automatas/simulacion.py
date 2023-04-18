@@ -22,6 +22,7 @@ class Simulacion(object):
         self.contador += 1
         return car
 
+
     def e_closure(self, nodos):
 
         nodos = [nodos] if type(nodos) != list else nodos
@@ -78,39 +79,59 @@ class Simulacion(object):
     def move_mega_automata(self, nodos, simbolo):
         nodos = [nodos] if type(nodos) != list else nodos
         n_nodos = []
-        simbolos_aceptados = []
+        if simbolo == '\n':
+            simbolo = '\\n'
+        elif simbolo == '\t':
+            simbolo = '\\t'
 
         for nodo in nodos:
             for s_nodo, valor in nodo.transicion.items():
                 simbolo = [simbolo] if type(simbolo) != list else simbolo
+            
                 if valor == simbolo:
-                    simbolos_aceptados.append(simbolo)
                     self.visitados[s_nodo] = True
                     n_nodos.append(s_nodo)
-
-        return n_nodos, simbolos_aceptados
+        return n_nodos
     
-    def simulacionAFN_YALEX(self, expresion):
+    def simulacionAFN_YALEX(self, expresion, reglas):
         self.contador = 0
         expresion = [caracter for caracter in expresion]
-        expresion.append('#') # Se agrega el simbolo de fin de cadena
+        expresion.append('@') # Se agrega el simbolo de fin de cadena
 
         S = self.e_closure(self.nodos[0])
         c = self.sigCar(expresion)
 
-        simbolos_aceptados = []
+        reconocidos = []
+        temp = ''
+        reconocidos = []
+        while (c != '@'):
 
-        while (c != '#'):
-            move, aceptados = self.move_mega_automata(S, c)
+            move = self.move_mega_automata(S, c)
+
+            if move == []:
+                mayor = 0
+                nodo_mayor = None
+                for s in S:
+                    # se encuentra el nodo con mayor prioridad
+                    if s.final_yalex:
+                        if s.prioridad > mayor:
+                            mayor = s.prioridad
+                            nodo_mayor = s
+                
+                if nodo_mayor:
+                    # reconocidos.append(nodo_mayor.valor_diccionario)
+                    temp = nodo_mayor.valor_diccionario
+
+                reconocidos.append(temp)
+                temp = ''
+
+                S = self.e_closure(self.nodos[0])
+                move = self.move_mega_automata(S, c)
+
+            temp += c
             S = self.e_closure(move)
             c = self.sigCar(expresion)
-            simbolos_aceptados.append(aceptados)
-
-        reconocidos = []
-        for s in S:
-            if s.final_yalex:
-                reconocidos.append(s.valor_diccionario)
-            
+        
 
         if len(reconocidos) > 0:
             return True, reconocidos
