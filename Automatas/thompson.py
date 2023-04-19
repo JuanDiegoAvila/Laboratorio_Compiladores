@@ -213,7 +213,6 @@ class Thompson(object):
         inicio = Nodo(0, False, False, {})
         final = Nodo(0, False, False, {})
 
-        
         if valor == '\t':
             valor = '\\t'
         elif valor == '\n':

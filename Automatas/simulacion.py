@@ -87,13 +87,12 @@ class Simulacion(object):
         for nodo in nodos:
             for s_nodo, valor in nodo.transicion.items():
                 simbolo = [simbolo] if type(simbolo) != list else simbolo
-            
                 if valor == simbolo:
                     self.visitados[s_nodo] = True
                     n_nodos.append(s_nodo)
         return n_nodos
     
-    def simulacionAFN_YALEX(self, expresion, reglas):
+    def simulacionAFN_YALEX(self, expresion):
         self.contador = 0
         expresion = [caracter for caracter in expresion]
         expresion.append('@') # Se agrega el simbolo de fin de cadena
@@ -111,27 +110,32 @@ class Simulacion(object):
             if move == []:
                 mayor = 0
                 nodo_mayor = None
+                nodos_reconocidos = []
                 for s in S:
                     # se encuentra el nodo con mayor prioridad
                     if s.final_yalex:
-                        if s.prioridad > mayor:
-                            mayor = s.prioridad
-                            nodo_mayor = s
-                
-                if nodo_mayor:
+                        nodos_reconocidos.append(s.valor_diccionario)
+                        # if s.prioridad > mayor:
+                        #     mayor = s.prioridad
+                        #     nodo_mayor = s
+                # if nodo_mayor:
                     # reconocidos.append(nodo_mayor.valor_diccionario)
-                    temp = nodo_mayor.valor_diccionario
+                if len(nodos_reconocidos) > 0 and nodos_reconocidos[0] != []:
+                    temp = nodos_reconocidos
+                else:
+                    temp = [temp]
 
+                S = self.e_closure(self.nodos[0])
                 reconocidos.append(temp)
                 temp = ''
 
-                S = self.e_closure(self.nodos[0])
+                
                 move = self.move_mega_automata(S, c)
+            
 
             temp += c
             S = self.e_closure(move)
             c = self.sigCar(expresion)
-        
 
         if len(reconocidos) > 0:
             return True, reconocidos

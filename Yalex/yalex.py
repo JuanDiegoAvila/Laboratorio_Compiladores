@@ -110,7 +110,7 @@ class Yalex(object):
 
                     temp_key = temp_key.replace(" ", "")
                     temp_key = temp_key.replace("'", "")
-                    temp_value = temp_value.replace(" print(\"", "").replace("\\n\")", "")
+                    temp_value = temp_value.replace(" print(\"", "").replace("\\n\")", "").replace("\")","")
                     # agregar el token y su valor a la lista de tokens
                     self.rules[temp_key] = temp_value
 
@@ -163,7 +163,6 @@ class Yalex(object):
                 actual = "|".join(letras_str)
             
             elif re.match(r"'(\w+)'-'(\w+)'", actual):
-                
                 inicio, fin = re.findall(r'\w+', actual)
                 letras = list(range(ord(inicio), ord(fin)+1))
                 letras_str = [chr(num) for num in letras]
@@ -177,9 +176,14 @@ class Yalex(object):
 
         # si algun nombre de un token esta en el valor, sustituirlo por el valor real del token
         for token in self.tokens:
-            for token2 in self.tokens:
-                if token != token2:
-                    self.tokens[token] = self.tokens[token].replace(token2, '('+self.tokens[token2]+')')
+            # recorrer de forma inversa el resto de tokens
+            for key2 in reversed(list(self.tokens.keys())):
+                if token != key2:
+                    self.tokens[token] = self.tokens[token].replace(key2, '('+self.tokens[key2]+')')
+
+            # for token2 in self.tokens:
+            #     if token != token2:
+            #         self.tokens[token] = self.tokens[token].replace(token2, '('+self.tokens[token2]+')')
 
     def getHeaderTrailer(self):
         header = False
@@ -187,11 +191,11 @@ class Yalex(object):
             for line in file:
                 if line.startswith("(*") and not header:
                     header = True
-                    self.header = line
+                    self.header = line.replace("(* ", "").replace(" *)", "")
                     continue
 
                 if line.startswith("(*") and header:
-                    self.trailer = line
+                    self.trailer = line.replace("(* ", "").replace(" *)", "")
 
         
 

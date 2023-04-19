@@ -9,15 +9,17 @@ sys.setrecursionlimit(5000)
 
 # Path al archivo YALex
 
-path = "./Yalex/ejemplo.txt"
+path = "./Yalex/Ejemplo 5.txt"
 
 YALEX = Yalex(path)
+
 
 automatas = []
 
 prioridad = 1
 # Crear un atomata por cada token
 for token in YALEX.tokens:
+
     expresion = YALEX.tokens[token]
 
     postfix = Postfix(expresion)
@@ -25,6 +27,7 @@ for token in YALEX.tokens:
     expresion = postfix.final
 
     thompson = Thompson(expresion)
+
     nodos = thompson.visitados
 
     for n in nodos:
@@ -84,84 +87,84 @@ simulacion = Simulacion(nodos)
 with open('./pickle/simulacion.pickle', 'wb') as f:
     pickle.dump(simulacion, f)
 
+header = YALEX.header if YALEX.header is not None else None
+trailer = YALEX.trailer if YALEX.trailer is not None else None
+
 # imprimir el grafo
 # grafo = Grafo(nodos)
 
 
+
 # escribir un script de python que utilice las reglas del yalex y simule el automata con un input
 
-# new_script = """
+new_script = """
 
-# import pickle
-# import re
+import pickle
+import re
 
-# # Cargar el archivo con el arreglo nodos
-# nodos = None
-# with open('./pickle/nodos.pickle', 'rb') as f:
-#     nodos = pickle.load(f)
+{header}
 
-# YALEX = None
-# with open('./pickle/YALEX.pickle', 'rb') as f:
-#     YALEX = pickle.load(f)
+# Cargar el archivo con el arreglo nodos
+nodos = None
+with open('./pickle/nodos.pickle', 'rb') as f:
+    nodos = pickle.load(f)
 
-# simulacion = None
-# with open('./pickle/simulacion.pickle', 'rb') as f:
-#     simulacion = pickle.load(f)
+YALEX = None
+with open('./pickle/YALEX.pickle', 'rb') as f:
+    YALEX = pickle.load(f)
 
-# rules = YALEX.rules
-# tokens = YALEX.tokens
+simulacion = None
+with open('./pickle/simulacion.pickle', 'rb') as f:
+    simulacion = pickle.load(f)
+
+rules = YALEX.rules
+tokens = YALEX.tokens
+
+token_keys = tokens.keys()
 
 
-# # Hacer la simulacion de el automata con cada cadena de entrada
+# Hacer la simulacion de el automata con cada cadena de entrada
 
-# with open('./Yalex/Entrada 2.txt', 'r') as file:
-#     output = []
-#     count_lineas = 0
-#     for line in file:
-#         if line == '\\n':
-#             continue
-            
-#         count_lineas += 1
-#         line = re.sub(r'\s+', ' ', line)
-
-#         words = line.split(' ')
-#         if words[0] == '/*':
-#             break
-#         else:
-#             count_word = 0
-
-#             for word in words:
-#                 if word == '':
-#                     continue
-                    
-#                 count_word += 1
-#                 # se hace la simulacion 
-#                 result, aceptado = simulacion.simulacionAFN_YALEX(word)
-#                 val = ""
-#                 if not result and not aceptado:
-#                     # buscar en el diccionario de reglas
-#                     for key, value in rules.items():
-#                         if key == word:
-#                             val = value
-#                             break
-
-#                 if aceptado:
-#                     output.append(aceptado[len(aceptado)-1])
-#                 elif val != "":
-#                     output.append(val)
-#                 else:
-#                     output.append("Error léxico en la línea " + str(count_lineas) + ", posicion " + str(count_word) + ": token no reconocido")
+with open('./Yalex/Entrada 4.txt', 'r') as file:
+    output = []
+    count_lineas = 0
+    expresion = ''
     
-#     # escribir archivo con todos los elementos de output
-#     with open('./Yalex/Output.txt', 'w', encoding='utf-8') as file:
-#         for i in output:
-#             file.write(i + "\\n")
+    for line in file:
+        count_lineas += 1
+        expresion += line+'\\n '
+        
+    
+    # se simula la expresion completa
+    result, aceptado = simulacion.simulacionAFN_YALEX(expresion)
 
-# """
+    output = []
+    for a in aceptado:
+        for token in a:
+            existe = False
+            for key, value in rules.items():
+                if token == key:
+                    existe = True
+                    if value != '':
+                        output.append(value)
+        
+            if not existe and token not in token_keys:
+                string = 'Error: ' + repr(token) + ' es un token que no existe'
+                output.append(string)
 
-# # escribir el script en un archivo
-# with open('./prueba.py', 'w', encoding='utf-8') as file:
-#     file.write(new_script)
+    # escribir archivo con todos los elementos de output
+    with open('./Yalex/Output.txt', 'w', encoding='utf-8') as file:
+        for i in output:
+            file.write(i + "\\n")
+
+{trailer}
+"""
+
+new_script = new_script.format(header=header, trailer=trailer)
+
+# escribir el script en un archivo
+with open('./prueba2.py', 'w', encoding='utf-8') as file:
+    file.write(new_script)
 
 
 

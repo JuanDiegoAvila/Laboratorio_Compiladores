@@ -1,12 +1,16 @@
-Identificador 
-Operador de suma 
-Número 
-Operador de multiplicación 
-Número 
-Operador de asignación 
-Identificador 
-Operador de suma 
-Número 
-Identificador 
-Error: '!' es un token que no existe
-Identificador 
+IDENTIFICADOR 
+WHITESPACE 
+PLUS 
+EQUALS 
+WHITESPACE 
+IDENTIFICADOR 
+WHITESPACE 
+POR 
+WHITESPACE 
+INTEGER 
+MINUS 
+WHITESPACE 
+FLOAT 
+PLUS 
+EQUALS 
+IDENTIFICADOR 
