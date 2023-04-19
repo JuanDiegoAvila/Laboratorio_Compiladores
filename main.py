@@ -13,15 +13,12 @@ path = "./Yalex/Ejemplo 5.txt"
 
 YALEX = Yalex(path)
 
-
 automatas = []
 
 prioridad = 1
 # Crear un atomata por cada token
 for token in YALEX.tokens:
-
     expresion = YALEX.tokens[token]
-
     postfix = Postfix(expresion)
     postfix.toPostfix()
     expresion = postfix.final
@@ -98,9 +95,7 @@ trailer = YALEX.trailer if YALEX.trailer is not None else None
 # escribir un script de python que utilice las reglas del yalex y simule el automata con un input
 
 new_script = """
-
 import pickle
-import re
 
 {header}
 

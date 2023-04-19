@@ -1,9 +1,8 @@
 
-
 import pickle
-import re
 
-int = 'gei'
+ 
+print('este es el header') 
 
 
 # Cargar el archivo con el arreglo nodos
@@ -59,4 +58,7 @@ with open('./Yalex/Entrada 4.txt', 'r') as file:
         for i in output:
             file.write(i + "\n")
 
-#Introducir cualquier trailer aqui
+
+print('este es el trailer')
+
+

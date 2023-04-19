@@ -7,19 +7,21 @@ class Yalex(object):
         self.tokens = {}
         self.rules = {}
         self.getRules()
-        self.getHeaderTrailer()
         self.check_error()
         self.getTokens()
         self.parseTokens()
+        self.getHeaderTrailer()
 
     def check_error(self):
         # Definimos una lista de palabras clave 
         keywords = ["let", "in", "if", "then", "else", "match", "with", "fun", "function", "try", "raise", "exception", "open", "module", "type", "mutable", "rec", "and", "rule"]
 
         with open(self.path, "r") as f:
+            filedata = f.read()
             lines = f.readlines()
 
         in_rule = False
+        es_comentario = False
         for linea in lines:
             words = linea.split()
 
@@ -37,6 +39,18 @@ class Yalex(object):
             # Si la linea empieza con (* y termina con *) entonces es un comentario
             pattern = r"^\(\*.*\*\)$"
             match = re.match(pattern, linea)
+
+            # Si la linea comienza con { es header o trailer
+            if linea.startswith("{"):
+                es_comentario = True
+                continue
+
+            if linea.startswith("}") or '}' in linea and es_comentario:
+                es_comentario = False
+                continue
+
+            if es_comentario:
+                continue
 
             if match:
                 continue
@@ -76,6 +90,8 @@ class Yalex(object):
         # leer el archivo con encoding utf-8
         with open(self.path, 'r', encoding='utf-8') as file:
             for line in file:
+                line = re.sub(r'\(\*.*?\*\)', '', line, flags=re.DOTALL)
+
                 if line.startswith("rule"):
                     is_rule = True
                     continue
@@ -117,7 +133,9 @@ class Yalex(object):
 
     def getTokens(self):
         with open(self.path, 'r') as file:
+            
             for line in file:
+                line = re.sub(r'\(\*.*?\*\)', '', line, flags=re.DOTALL)
                 # si la linea empieza con let, es un token\
 
                 if line.startswith("let"):
@@ -137,7 +155,6 @@ class Yalex(object):
                     
                     # agregar el token y su valor a la lista de tokens
                     self.tokens[token] = value
-
     def parseTokens(self):
         # Si el token tiene la forma ['0' - '9'] entonces poner de la forma '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
         
@@ -186,25 +203,71 @@ class Yalex(object):
             #         self.tokens[token] = self.tokens[token].replace(token2, '('+self.tokens[token2]+')')
 
     def getHeaderTrailer(self):
-        header = False
+
         with open(self.path, 'r', encoding='utf-8') as file:
+            
+            header = False
+            termino_header = False
+            termino_trailer = False
+            trailer = False
             for line in file:
-                if line.startswith("(*") and not header:
+                line = re.sub(r'\(\*.*?\*\)', '', line, flags=re.DOTALL)
+                # si la linea empieza con let, es un token\
+                
+                if line.startswith('{') and not header:
+                    self.header = ''
                     header = True
-                    self.header = line.replace("(* ", "").replace(" *)", "")
+                    if '}' in line:
+                        for char in line:
+                            if char == '}':
+                                termino_header = True
+                                break
+                            if char != '{':
+                                self.header += char
+                        continue
+                    
+                if (line.startswith('}') or '}' in line) and header and not termino_header:
+                    for char in line:
+                        if char == '}':
+                            break
+                        self.header += char
+                    termino_header = True
                     continue
 
-                if line.startswith("(*") and header:
-                    self.trailer = line.replace("(* ", "").replace(" *)", "")
+                if line.startswith('{') and termino_header:
+                    self.trailer = ''
+                    trailer = True
+                    if '}' in line:
+                        for char in line:
+                            if char == '}':
+                                termino_trailer = True
+                                break
+                            if char != '{':
+                                self.trailer += char
+                        continue
+                
+                if (line.startswith('}') or '}' in line) and trailer and not termino_trailer:
+                    for char in line:
+                        if char == '}':
+                            break
+                        self.trailer += char
+                    termino_trailer = True
+                    continue
 
-        
+                if header and not termino_header:
+                    for char in line:
+                        if char == '}':
+                            termino_header = True
+                            break
+                        if char != '{':
+                            self.header += char
+                    # self.header += line
 
-        
-
-
-
-
-
-
-    
-
+                if trailer:
+                    for char in line:
+                        if char == '}':
+                            termino_trailer = True
+                            break
+                        if char != '{':
+                            self.trailer += char
+                    # self.trailer += line
