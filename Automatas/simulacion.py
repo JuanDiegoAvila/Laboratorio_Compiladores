@@ -102,7 +102,10 @@ class Simulacion(object):
 
         reconocidos = []
         temp = ''
+        temp2 = ''
         reconocidos = []
+
+        texto_reconocido = []
         while (c != '@'):
 
             move = self.move_mega_automata(S, c)
@@ -126,21 +129,24 @@ class Simulacion(object):
                     temp = [temp]
 
                 S = self.e_closure(self.nodos[0])
+                texto_reconocido.append(temp2)
                 reconocidos.append(temp)
                 temp = ''
+                temp2 = ''
 
                 
                 move = self.move_mega_automata(S, c)
             
 
             temp += c
+            temp2 += c
             S = self.e_closure(move)
             c = self.sigCar(expresion)
 
         if len(reconocidos) > 0:
-            return True, reconocidos
+            return True, reconocidos, texto_reconocido
         else:
-            return False, False
+            return False, False, False
 
 
     def simulacionAFD(self):

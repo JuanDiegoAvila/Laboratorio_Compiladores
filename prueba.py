@@ -33,13 +33,21 @@ with open('./Yalex/Entrada 4.txt', 'r') as file:
         
     
     # se simula la expresion completa
-    result, aceptado = simulacion.simulacionAFN_YALEX(expresion)
+    result, aceptado, texto_reconocido = simulacion.simulacionAFN_YALEX(expresion)
 
     output = []
+    indice = 0
     for a in aceptado:
+
         for token in a:
             existe = False
             for key, value in rules.items():
+                if texto_reconocido[indice] == key:
+                    if value != '':
+                        output.append(value)
+                    existe = True
+                    break
+
                 if token == key:
                     existe = True
                     if value != '':
@@ -48,6 +56,7 @@ with open('./Yalex/Entrada 4.txt', 'r') as file:
             if not existe and token not in token_keys:
                 string = 'Error: ' + repr(token) + ' es un token que no existe'
                 output.append(string)
+        indice += 1
 
     # escribir archivo con todos los elementos de output
     with open('./Yalex/Output.txt', 'w', encoding='utf-8') as file:

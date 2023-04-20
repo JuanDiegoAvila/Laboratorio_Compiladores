@@ -10,10 +10,8 @@ let digit = (0|1|2|3|4|5|6|7|8|9)
 let digits = digit+
 let integer = digits
 let float = digits('.'digits)
-let letra = ['a'-'z''A'-'Z']
+let letra = ['a'-'z']
 let identificador = letra(letra|digit)*
-
-
 
 rule tokens = 
     ws        { print("WHITESPACE") }
@@ -26,7 +24,6 @@ rule tokens =
   | '-'       { print("MINUS") }
   | '/'       { print("DIV") }
   | '='       { print("EQUALS") }
-  | eof       { print("EOF") }
   | if         { print("IF") }
   | then       { print("THEN") }
   | else       { print("ELSE") }
