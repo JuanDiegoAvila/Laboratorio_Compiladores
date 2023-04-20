@@ -57,7 +57,7 @@ with open('./Yalex/Entrada 4.txt', 'r') as file:
                     if value != '':
                         output.append(value)
         
-            if not existe and token not in token_keys:
+            if not existe and token not in token_keys and token != '':
                 string = 'Error: ' + repr(token) + ' es un token que no existe'
                 output.append(string)
         indice += 1

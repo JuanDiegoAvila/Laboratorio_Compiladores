@@ -90,8 +90,6 @@ trailer = YALEX.trailer if YALEX.trailer is not None else None
 # imprimir el grafo
 # grafo = Grafo(nodos)
 
-
-
 # escribir un script de python que utilice las reglas del yalex y simule el automata con un input
 
 new_script = """
@@ -151,7 +149,7 @@ with open('./Yalex/Entrada 4.txt', 'r') as file:
                     if value != '':
                         output.append(value)
         
-            if not existe and token not in token_keys:
+            if not existe and token not in token_keys and token != '':
                 string = 'Error: ' + repr(token) + ' es un token que no existe'
                 output.append(string)
         indice += 1

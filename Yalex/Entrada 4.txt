@@ -1,1 +1,1 @@
-ifvariable
++Hola1 += Hola * 12- 12.369+=hola if else for then (hola) while if(1.2)
