@@ -135,7 +135,7 @@ with open('{entrada}', 'r') as file:
     
     # se simula la expresion completa
     result, aceptado, texto_reconocido = simulacion.simulacionAFN_YALEX(expresion)
-
+    
     output = []
     indice = 0
     for a in aceptado:
@@ -146,13 +146,14 @@ with open('{entrada}', 'r') as file:
                 if texto_reconocido[indice] == key:
                     if value != '':
                         output.append(value)
-                    existe = True
+                        existe = True
                     break
 
-                if token == key:
-                    existe = True
+                if token == key and not existe:
                     if value != '':
                         output.append(value)
+                        existe = True
+                    break
         
             if not existe and token not in token_keys and token != '':
                 string = 'Error: ' + repr(token) + ' es un token que no existe'

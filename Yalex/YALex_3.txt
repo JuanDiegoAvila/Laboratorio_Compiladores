@@ -8,14 +8,14 @@ let digitos = digito+
 let numero = '-'?digito+
 let decimal = '-'?digitos('.'digitos)
 let letra = ['a'-'z''A'-'Z']
-let identificador = letra(letra|digito)*xyz
+let identificador = (letra(letra|digito)*)*xyz
 let cadena = "(letra|digito|espacio)*"
 
 rule tokens =
 	espacioEnBlanco	{}
-  | identificador	{ print("Identificador\n") }
   | numero			{ print("Número Entero\n") }
   | decimal			{ print("Número Decimal\n") }
   | if         { print("Palabra reservada if\n") }
   | for       { print("Palabra reservada for\n") }
   | cadena	 { print("Cadena\n") }
+  | identificador	{ print("Identificador\n") }

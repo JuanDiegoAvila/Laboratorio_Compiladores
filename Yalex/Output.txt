@@ -1,7 +1,20 @@
 Identificador 
-Error: 'sdafk' es un token que no existe
+Identificador 
 Número Entero 
 Número Decimal 
 Palabra reservada if 
 Palabra reservada for 
+Cadena 
+Identificador 
+Número Entero 
+Número Decimal 
+Palabra reservada for 
+Cadena 
+Número Entero 
+Identificador 
+Número Decimal 
+Número Entero 
+Palabra reservada for 
+Palabra reservada if 
+Número Decimal 
 Cadena 
