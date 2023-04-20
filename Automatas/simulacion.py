@@ -111,18 +111,13 @@ class Simulacion(object):
             move = self.move_mega_automata(S, c)
 
             if move == []:
-                mayor = 0
-                nodo_mayor = None
+                
                 nodos_reconocidos = []
                 for s in S:
                     # se encuentra el nodo con mayor prioridad
                     if s.final_yalex:
                         nodos_reconocidos.append(s.valor_diccionario)
-                        # if s.prioridad > mayor:
-                        #     mayor = s.prioridad
-                        #     nodo_mayor = s
-                # if nodo_mayor:
-                    # reconocidos.append(nodo_mayor.valor_diccionario)
+
                 if len(nodos_reconocidos) > 0 and nodos_reconocidos[0] != []:
                     temp = nodos_reconocidos
                 else:
@@ -134,19 +129,18 @@ class Simulacion(object):
                 temp = ''
                 temp2 = ''
 
-                
                 move = self.move_mega_automata(S, c)
             
-
             temp += c
             temp2 += c
+            
             S = self.e_closure(move)
             c = self.sigCar(expresion)
 
         if len(reconocidos) > 0:
             return True, reconocidos, texto_reconocido
         else:
-            return False, False, False
+            return False, [], False
 
 
     def simulacionAFD(self):

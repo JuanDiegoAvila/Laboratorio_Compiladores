@@ -8,12 +8,10 @@ sys.setrecursionlimit(5000)
 
 
 # Path al archivo YALex
-
 path = "./Yalex/YALex_3.txt"
 entrada = "./Yalex/Entrada 3.txt"
 
 YALEX = Yalex(path)
-
 automatas = []
 
 prioridad = 1
@@ -39,11 +37,6 @@ for token in YALEX.tokens:
         n.final = False
 
     prioridad += 1
-
-    # if token == 'identificador':
-    #     print(YALEX.tokens[token])
-    #     grafo = Grafo(nodos)
-
     automatas.append(nodos)
 
 # Crear un automata con todos los automatas del arreglo
@@ -64,10 +57,6 @@ for automata in automatas:
             # Crear una transicion del nodo sin transicion al nodo final
             nodo.addTransition(final, "ε")
             break
-
-    # # Crear una transicion del ultimo nodo del automata al nodo final
-    # automata[-1].addTransition(final, "ε")
-
 
 # crear un arreglo con todos los nodos
 
@@ -91,9 +80,6 @@ with open('./pickle/simulacion.pickle', 'wb') as f:
 
 header = YALEX.header if YALEX.header is not None else None
 trailer = YALEX.trailer if YALEX.trailer is not None else None
-
-# imprimir el grafo
-# grafo = Grafo(nodos)
 
 # escribir un script de python que utilice las reglas del yalex y simule el automata con un input
 
@@ -130,35 +116,39 @@ with open('{entrada}', 'r') as file:
     
     for line in file:
         count_lineas += 1
-        expresion += line+'\\n '
-        
+        line = line + ' '
     
-    # se simula la expresion completa
-    result, aceptado, texto_reconocido = simulacion.simulacionAFN_YALEX(expresion)
-    
-    output = []
-    indice = 0
-    for a in aceptado:
-
-        for token in a:
-            existe = False
-            for key, value in rules.items():
-                if texto_reconocido[indice] == key:
-                    if value != '':
-                        output.append(value)
-                        existe = True
-                    break
-
-                if token == key and not existe:
-                    if value != '':
-                        output.append(value)
-                        existe = True
-                    break
+        # se simula la expresion completa
+        result, aceptado, texto_reconocido = simulacion.simulacionAFN_YALEX(line)
         
-            if not existe and token not in token_keys and token != '':
-                string = 'Error: ' + repr(token) + ' es un token que no existe'
-                output.append(string)
-        indice += 1
+        indice = 0
+        for a in aceptado:
+            for token in a:
+                existe = False
+                for key, value in rules.items():
+                    if texto_reconocido[indice] == key:
+                        if value != '':
+                            output.append(value)
+                            print(value)
+                            existe = True
+                        break
+
+                    if token == key and not existe:
+                        if value != '':
+                            output.append(value)
+                            print(value)
+                            existe = True
+                        break
+            
+                if not existe and token not in token_keys and token != '':
+                    posicion = 0
+                    for i in range(indice):
+                        posicion += len(texto_reconocido[i])
+
+                    string = 'Error lexico en la linea '+ str(count_lineas) +' en la posicion ' + str(posicion)+': ' + repr(token) + ' no es un token valido'
+                    output.append(string)
+                    print(string)
+            indice += 1
 
     # escribir archivo con todos los elementos de output
     with open('./Yalex/Output.txt', 'w', encoding='utf-8') as file:
@@ -171,7 +161,7 @@ with open('{entrada}', 'r') as file:
 new_script = new_script.format(header=header, trailer=trailer, entrada=entrada)
 
 # escribir el script en un archivo
-with open('./prueba2.py', 'w', encoding='utf-8') as file:
+with open('./AL.py', 'w', encoding='utf-8') as file:
     file.write(new_script)
 
 

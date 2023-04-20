@@ -4,6 +4,7 @@ Número Entero
 Número Decimal 
 Palabra reservada if 
 Palabra reservada for 
+Error lexico en la linea 1 en la posicion 39: 'aa' no es un token valido
 Cadena 
 Identificador 
 Número Entero 

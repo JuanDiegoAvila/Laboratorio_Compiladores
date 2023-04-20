@@ -187,7 +187,6 @@ class Yalex(object):
 
 
             actual = actual.replace("''", "'|'")
-            # actual = actual.replace("'", "")
 
             self.tokens[token] = actual
 
@@ -198,9 +197,6 @@ class Yalex(object):
                 if token != key2:
                     self.tokens[token] = self.tokens[token].replace(key2, '('+self.tokens[key2]+')')
 
-            # for token2 in self.tokens:
-            #     if token != token2:
-            #         self.tokens[token] = self.tokens[token].replace(token2, '('+self.tokens[token2]+')')
 
     def getHeaderTrailer(self):
 
