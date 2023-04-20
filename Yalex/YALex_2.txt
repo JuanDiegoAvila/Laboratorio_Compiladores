@@ -1,0 +1,23 @@
+
+let delimitador = [' ''\t''\n']
+let espacioEnBlanco = delimitador+
+let digito = ['0'-'9']
+let digitos = digito+
+let numero = '-'?digito+
+let decimal = '-'?digitos('.'digitos)
+let mayuscula = ['A'-'Z']
+let hexadecimal = "(digito|mayuscula)*"
+
+rule tokens =
+	espacioEnBlanco	{}
+  | numero			{ print("Número Entero\n") }
+  | decimal			{ print("Número Decimal\n") }
+  | '+'				{ print("Operador de suma\n") }
+  | '*'				{ print("Operador de multiplicación\n") }
+  | '='				{ print("Operador de asignación\n") }
+  | '/'				{ print("Operador de división\n") }
+  | '-'				{ print("Operador de resta\n") }
+  | '^'				{ print("Operador de potencia\n") }
+  | if        { print("Palabra reservada if\n") }
+  | for       { print("Palabra reservada for\n") }
+  | while     { print("Palabra reservada while\n") }

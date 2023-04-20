@@ -9,7 +9,8 @@ sys.setrecursionlimit(5000)
 
 # Path al archivo YALex
 
-path = "./Yalex/Ejemplo 5.txt"
+path = "./Yalex/YALex_3.txt"
+entrada = "./Yalex/Entrada 3.txt"
 
 YALEX = Yalex(path)
 
@@ -38,6 +39,10 @@ for token in YALEX.tokens:
         n.final = False
 
     prioridad += 1
+
+    # if token == 'identificador':
+    #     print(YALEX.tokens[token])
+    #     grafo = Grafo(nodos)
 
     automatas.append(nodos)
 
@@ -118,7 +123,7 @@ token_keys = tokens.keys()
 
 # Hacer la simulacion de el automata con cada cadena de entrada
 
-with open('./Yalex/Entrada 4.txt', 'r') as file:
+with open('{entrada}', 'r') as file:
     output = []
     count_lineas = 0
     expresion = ''
@@ -162,7 +167,7 @@ with open('./Yalex/Entrada 4.txt', 'r') as file:
 {trailer}
 """
 
-new_script = new_script.format(header=header, trailer=trailer)
+new_script = new_script.format(header=header, trailer=trailer, entrada=entrada)
 
 # escribir el script en un archivo
 with open('./prueba2.py', 'w', encoding='utf-8') as file:

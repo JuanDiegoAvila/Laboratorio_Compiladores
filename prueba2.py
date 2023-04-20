@@ -1,9 +1,7 @@
 
 import pickle
 
- 
-print('este es el header') 
-
+None
 
 # Cargar el archivo con el arreglo nodos
 nodos = None
@@ -26,7 +24,7 @@ token_keys = tokens.keys()
 
 # Hacer la simulacion de el automata con cada cadena de entrada
 
-with open('./Yalex/Entrada 4.txt', 'r') as file:
+with open('./Yalex/Entrada 3.txt', 'r') as file:
     output = []
     count_lineas = 0
     expresion = ''
@@ -67,7 +65,4 @@ with open('./Yalex/Entrada 4.txt', 'r') as file:
         for i in output:
             file.write(i + "\n")
 
-
-print('este es el trailer')
-
-
+None

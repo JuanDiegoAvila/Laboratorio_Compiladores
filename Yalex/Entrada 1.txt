@@ -1,3 +1,1 @@
-variable   + 5 *		-11 = otraVariable + 2
-variable3 !
-hola
+"ABC123" 1230 12.32131 + - / * = ^
