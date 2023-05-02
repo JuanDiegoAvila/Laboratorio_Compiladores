@@ -8,7 +8,7 @@ let digitos = digito+
 let numero = '-'?digito+
 let decimal = '-'?digitos('.'digitos)
 let letra = ['a'-'z''A'-'Z']
-let identificador = (letra(letra|digito)*)*xyz
+let identificador = (letra(letra|digito)*)*abc
 let cadena = "(letra|digito|espacio)*"
 
 rule tokens =

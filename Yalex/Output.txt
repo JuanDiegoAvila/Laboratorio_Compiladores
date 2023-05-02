@@ -1,21 +1,6 @@
-Identificador 
-Identificador 
-Número Entero 
+Error lexico en la linea 1 en la posicion 0: 'asdlfkjasdfxyz' no es un token valido
 Número Decimal 
-Palabra reservada if 
-Palabra reservada for 
-Error lexico en la linea 1 en la posicion 39: 'aa' no es un token valido
-Cadena 
-Identificador 
+Error lexico en la linea 1 en la posicion 22: '.' no es un token valido
 Número Entero 
-Número Decimal 
-Palabra reservada for 
-Cadena 
-Número Entero 
-Identificador 
-Número Decimal 
-Número Entero 
-Palabra reservada for 
-Palabra reservada if 
-Número Decimal 
-Cadena 
+Error lexico en la linea 1 en la posicion 27: '"asfc ' no es un token valido
+Error lexico en la linea 1 en la posicion 33: '&' no es un token valido
