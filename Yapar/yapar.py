@@ -74,6 +74,16 @@ class YAPAR(object):
         for key in gramatica:
             self.gramatica[key] = gramatica[key]
 
+    def getSimbolosGramaticales(self):
+        simbolos = []
+        for key in self.gramatica:
+            simbolos.append(key)
+            for produccion in self.gramatica[key]:
+                for simbolo in produccion:
+                    if simbolo not in simbolos:
+                        simbolos.append(simbolo)
+        return simbolos
+    
     def cerradura(self, I):
         J = I.copy()
 
@@ -122,139 +132,184 @@ class YAPAR(object):
             if agregados == 0:
                 break
         
-        for elemento in J.copy():
-            if elemento in I:
-                J.remove(elemento)
+        # for elemento in J.copy():
+        #     if elemento in I:
+        #         J.remove(elemento)
 
         return J
 
-    def getSimbolosGramaticales(self):
-        simbolos = []
-        for key in self.gramatica:
-            simbolos.append(key)
-            for produccion in self.gramatica[key]:
-                for simbolo in produccion:
-                    if simbolo not in simbolos:
-                        simbolos.append(simbolo)
-        return simbolos
-    
     def ir_a(self, I, X):
-
-        # se busca las producciones que tengan a X como el elemento que sigue al punto
-        # y se desplaza el punto una posición a la derecha
-        # se hace la cerradura de las producciones encontradas para encontrar el resto de elementos del conjunto
         J = []
+        
+        existe = False
         for elemento in I.copy():
             partes = elemento.split(" -> ")
 
             derecha_expresion = partes[1].split(' ')
-
             for elemento in derecha_expresion:
                 if elemento == '•':
                     # si el punto esta al final de la expresion no se hace nada
                     if derecha_expresion.index(elemento) == len(derecha_expresion)-1:
-                        return [], []
+                        pass
                     
-                    index = derecha_expresion.index(elemento)
-                    punto = derecha_expresion[index+1]
-
-
-            # Buscar las producciones del elemento que tengan tambien a X como el elemento que sigue al punto
-            
-            producciones = []
-            for key in self.gramatica.copy():
-                for produccion in self.gramatica[key]:
-                    nuevo = key + ' -> ' + ' '.join(produccion)
-                    nuevo = nuevo.split(' ')
-
-                    if len (produccion) > 1:
-                        if produccion[0] == punto and produccion[0] == X:
-                            producciones.append(nuevo)
                     else:
-                        if produccion[0] == punto and produccion[0] == X:
-                            producciones.append(nuevo)
+                        index = derecha_expresion.index(elemento)
+                        punto = derecha_expresion[index+1]
 
-            for produccion in producciones:
-                
-                # se busca los elementos luego del -> en la produccion
-                derecha = produccion[2:]
+                        if punto == X:
+                            existe = True
 
-                # se coloca el punto luego del elemento X en la produccion
-                for elemento in derecha:
-                    if elemento == X:
-                        index = derecha.index(elemento)
-                        
-                        # se agrega un nuevo elemento en el index + 1
-                        derecha.insert(index+1, '•')
+                            # Se agrega el elemento a J con el punto desplazado una posición a la derecha
+                            derecha_expresion[index] = punto
+                            derecha_expresion[index+1] = '•'
 
-                produccion = produccion[0] + ' -> ' + ' '.join(derecha)
+                            string = ' '.join(derecha_expresion)
+                            J.append(partes[0] + ' -> ' + string)
+                            break
 
-                if produccion not in J:
-                    J.append(produccion)
-
-        if len(J) > 0:
-            return J, self.cerradura(J)
-        else:
+        if not existe:
             return [], []
+        
+        return J, self.cerradura(J)
 
-    def getNodo(self, nodos, corazon):
+
+    # def ir_a(self, I, X):
+
+    #     # se busca las producciones que tengan a X como el elemento que sigue al punto
+    #     # y se desplaza el punto una posición a la derecha
+    #     # se hace la cerradura de las producciones encontradas para encontrar el resto de elementos del conjunto
+    #     J = []
+    #     for elemento in I.copy():
+    #         partes = elemento.split(" -> ")
+
+    #         derecha_expresion = partes[1].split(' ')
+
+    #         for elemento in derecha_expresion:
+    #             if elemento == '•':
+    #                 # si el punto esta al final de la expresion no se hace nada
+    #                 if derecha_expresion.index(elemento) == len(derecha_expresion)-1:
+    #                     return [], []
+                    
+    #                 index = derecha_expresion.index(elemento)
+    #                 punto = derecha_expresion[index+1]
+
+
+    #         # Buscar las producciones del elemento que tengan tambien a X como el elemento que sigue al punto
+            
+    #         producciones = []
+    #         for key in self.gramatica.copy():
+    #             for produccion in self.gramatica[key]:
+    #                 nuevo = key + ' -> ' + ' '.join(produccion)
+    #                 nuevo = nuevo.split(' ')
+
+    #                 if len (produccion) > 1:
+    #                     if produccion[0] == punto and produccion[0] == X:
+    #                         producciones.append(nuevo)
+    #                 else:
+    #                     if produccion[0] == punto and produccion[0] == X:
+    #                         producciones.append(nuevo)
+
+    #         for produccion in producciones:
+                
+    #             # se busca los elementos luego del -> en la produccion
+    #             derecha = produccion[2:]
+
+    #             # se coloca el punto luego del elemento X en la produccion
+    #             for elemento in derecha:
+    #                 if elemento == X:
+    #                     index = derecha.index(elemento)
+                        
+    #                     # se agrega un nuevo elemento en el index + 1
+    #                     derecha.insert(index+1, '•')
+
+    #             produccion = produccion[0] + ' -> ' + ' '.join(derecha)
+
+    #             if produccion not in J:
+    #                 J.append(produccion)
+
+    #     # print("J: ", J, "\n")
+    #     # print("X: ", X, "\n")
+    #     # print("I: ", I, "\n")
+
+    #     # input()
+        
+    #     if len(J) > 0:
+    #         return J, self.cerradura(J)
+    #     else:
+    #         return [], []
+
+    def getNodo(self, nodos, contenido):
         for nodo in nodos.copy():
-            if type(corazon) != list:
-                corazon = [corazon]
-            if nodo.corazon == corazon:
+            if set(nodo.contenido) == set(contenido):
                 return nodo
         return None
-
 
     def getArbol(self):
 
         G = gv.Digraph(format='png', graph_attr={'rankdir':'LR', 'shape':'square'})
-        nodos = []
+        
 
         # Se pone al primer elemento de la gramatica como el corazon y se le agrega un punto
         corazon = list(self.gramatica.keys())[0] + ' -> • ' + ' '.join(self.gramatica[list(self.gramatica.keys())[0]][0])
         C = [self.cerradura([corazon])]
 
-        str_1 = corazon + '\n================================\n' + '\n'.join(C[0])
-        G.node(str_1, shape='box')
-         
-        # primero = N([corazon], C)
-        # nodos.append(primero)
+        str_1 = str(corazon) + '\n================================\n' + '\n'.join(C[0])
+        # G.node(str_1, shape='box')
+        
+        nodos = []
+        nodoI = N(corazon, C[0])
+        nodos.append(nodoI)
 
         while True:
             agregados = 0
-            for i in C.copy():
+            copia_C = C.copy()
+
+            for i in copia_C:
+                nodo_i = self.getNodo(nodos, i)
+
                 for simbolo in self.simbolosG:
-                    CORAZON, RESTO = self.ir_a(i, simbolo)
+                    CORAZON, CERRADURA = self.ir_a(i, simbolo)
 
-                    if len(CORAZON) > 0 or len(RESTO) > 0:
-                        print(CORAZON)
-                        print(RESTO)
-                        str_temp = '\n'.join(CORAZON) + '\n================================\n' + '\n'.join(RESTO)
-                        G.node(str_temp, shape='box')
+                    if len(CERRADURA) == 0 and len(CORAZON) == 0:
+                        continue
 
-                        # nuevo = N(CORAZON, RESTO)
+                    if CERRADURA not in C:
                         
-                        # nodos.append(nuevo)
+                        nodo_nuevo = N(CORAZON, CERRADURA)
+                        nodos.append(nodo_nuevo)
+
+                        # crear transicion 
+                        nodo_i.createTransicion(nodo_nuevo, simbolo)
+
+                        C.append(CERRADURA)
+                        agregados += 1
+
+                    else:
+                        nodo_n = self.getNodo(nodos, CERRADURA)
+                        nodo_i.createTransicion(nodo_n, simbolo)
+
+
+                    temp_cerradura = ''
+                    for e in CERRADURA:
+                        if e not in CORAZON:
+                            temp_cerradura += e + '\n'
+
+
+                    # str_temp = '\n'.join(CORAZON) + '\n================================\n' + temp_cerradura
                     
-                        # # se crea la transicion del nodo actual al nuevo nodo
-                        # nodo = self.getNodo(nodos, corazon)
-                        # if nodo != None:
-                        #     nodo.createTransicion(simbolo, nuevo)
-
-                        # corazon = CORAZON
-
-                        if CORAZON+RESTO not in C:
-                            C.append(CORAZON+RESTO)
-                            print(C)
-                            input()
-                            agregados += 1
-                        
+                    # G.node(str_temp, shape='box')
+ 
             if agregados == 0:
                 break
-        
-        print(C)
 
+        j, cerrradura = self.ir_a(["expression' -> expression •", 'expression -> expression • PLUS term'], 'PLUS')
+        print('j: ', j)
+        print('cerradura: ', cerrradura)
+
+        for n in nodos.copy():
+            G.node(n.nombre, shape='box')
+            for key, value in n.transicion.items():
+                G.edge(n.nombre, key.nombre, label=value)
 
         G.render("test-output/prueba.gv", view=True)
 
@@ -263,6 +318,7 @@ class N(object):
         self.corazon = corazon
         self.resto = resto
         self.nombre = self.getNombre()
+        self.contenido = self.getContenido()
         self.transicion = {}
 
     def createTransicion(self, simbolo, nodo):
@@ -270,21 +326,43 @@ class N(object):
     
     def getNombre(self):
         str = ''
-        for elemento in self.corazon:
-            str += elemento + '\n'
+        
+        if type(self.corazon) == list:
+            for elemento in self.corazon:
+                str += elemento + '\n'
+        
+        else:
+            str += self.corazon
 
         str += '\n=====================\n'
         
         for elemento in self.resto:
+            if elemento in self.corazon:
+                continue
             str += elemento + '\n'
+            # str += elemento + '\n'
         return str
     
+    def getContenido(self):
+        contenido = []
+        if type(self.corazon) == list:
+            for elemento in self.corazon:
+                contenido.append(elemento)
+        
+        else:
+            contenido.append(self.corazon)
+        
+        for elemento in self.resto:
+            contenido.append(elemento)
 
-    def __str__(self):
-        return self.nombre
+        return contenido
     
-    def __repr__(self):
-        return self.nombre
+
+    # def __str__(self):
+    #     return str(self.contenido)
+    
+    # def __repr__(self):
+    #     return str(self.contenido)
 
 
 
