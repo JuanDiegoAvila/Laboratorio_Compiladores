@@ -101,9 +101,6 @@ class YAPAR(object):
 
                         index = lista.index(expresion)
                         punto = lista[index+1]
-
-
-            # punto = punto.replace('•', '')
             
             # Buscar las producciones del elemento con punto
             producciones = []
@@ -131,10 +128,6 @@ class YAPAR(object):
 
             if agregados == 0:
                 break
-        
-        # for elemento in J.copy():
-        #     if elemento in I:
-        #         J.remove(elemento)
 
         return J
 
@@ -172,72 +165,6 @@ class YAPAR(object):
         
         return J, self.cerradura(J)
 
-
-    # def ir_a(self, I, X):
-
-    #     # se busca las producciones que tengan a X como el elemento que sigue al punto
-    #     # y se desplaza el punto una posición a la derecha
-    #     # se hace la cerradura de las producciones encontradas para encontrar el resto de elementos del conjunto
-    #     J = []
-    #     for elemento in I.copy():
-    #         partes = elemento.split(" -> ")
-
-    #         derecha_expresion = partes[1].split(' ')
-
-    #         for elemento in derecha_expresion:
-    #             if elemento == '•':
-    #                 # si el punto esta al final de la expresion no se hace nada
-    #                 if derecha_expresion.index(elemento) == len(derecha_expresion)-1:
-    #                     return [], []
-                    
-    #                 index = derecha_expresion.index(elemento)
-    #                 punto = derecha_expresion[index+1]
-
-
-    #         # Buscar las producciones del elemento que tengan tambien a X como el elemento que sigue al punto
-            
-    #         producciones = []
-    #         for key in self.gramatica.copy():
-    #             for produccion in self.gramatica[key]:
-    #                 nuevo = key + ' -> ' + ' '.join(produccion)
-    #                 nuevo = nuevo.split(' ')
-
-    #                 if len (produccion) > 1:
-    #                     if produccion[0] == punto and produccion[0] == X:
-    #                         producciones.append(nuevo)
-    #                 else:
-    #                     if produccion[0] == punto and produccion[0] == X:
-    #                         producciones.append(nuevo)
-
-    #         for produccion in producciones:
-                
-    #             # se busca los elementos luego del -> en la produccion
-    #             derecha = produccion[2:]
-
-    #             # se coloca el punto luego del elemento X en la produccion
-    #             for elemento in derecha:
-    #                 if elemento == X:
-    #                     index = derecha.index(elemento)
-                        
-    #                     # se agrega un nuevo elemento en el index + 1
-    #                     derecha.insert(index+1, '•')
-
-    #             produccion = produccion[0] + ' -> ' + ' '.join(derecha)
-
-    #             if produccion not in J:
-    #                 J.append(produccion)
-
-    #     # print("J: ", J, "\n")
-    #     # print("X: ", X, "\n")
-    #     # print("I: ", I, "\n")
-
-    #     # input()
-        
-    #     if len(J) > 0:
-    #         return J, self.cerradura(J)
-    #     else:
-    #         return [], []
-
     def getNodo(self, nodos, contenido):
         for nodo in nodos.copy():
             if set(nodo.contenido) == set(contenido):
@@ -252,10 +179,7 @@ class YAPAR(object):
         # Se pone al primer elemento de la gramatica como el corazon y se le agrega un punto
         corazon = list(self.gramatica.keys())[0] + ' -> • ' + ' '.join(self.gramatica[list(self.gramatica.keys())[0]][0])
         C = [self.cerradura([corazon])]
-
-        str_1 = str(corazon) + '\n================================\n' + '\n'.join(C[0])
-        # G.node(str_1, shape='box')
-        
+       
         nodos = []
         nodoI = N(corazon, C[0])
         nodos.append(nodoI)
@@ -288,23 +212,13 @@ class YAPAR(object):
                         nodo_n = self.getNodo(nodos, CERRADURA)
                         nodo_i.createTransicion(nodo_n, simbolo)
 
-
                     temp_cerradura = ''
                     for e in CERRADURA:
                         if e not in CORAZON:
                             temp_cerradura += e + '\n'
-
-
-                    # str_temp = '\n'.join(CORAZON) + '\n================================\n' + temp_cerradura
-                    
-                    # G.node(str_temp, shape='box')
  
             if agregados == 0:
                 break
-
-        j, cerrradura = self.ir_a(["expression' -> expression •", 'expression -> expression • PLUS term'], 'PLUS')
-        print('j: ', j)
-        print('cerradura: ', cerrradura)
 
         for n in nodos.copy():
             G.node(n.nombre, shape='box')
@@ -357,13 +271,6 @@ class N(object):
 
         return contenido
     
-
-    # def __str__(self):
-    #     return str(self.contenido)
-    
-    # def __repr__(self):
-    #     return str(self.contenido)
-
 
 
 yap = YAPAR('./slr-1.txt')
