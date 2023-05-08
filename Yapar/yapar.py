@@ -1,6 +1,48 @@
 import re
 import graphviz as gv
 
+class N(object):
+    def __init__(self, corazon, resto, transicion = None):
+        self.corazon = corazon
+        self.resto = resto
+        self.nombre = self.getNombre()
+        self.contenido = self.getContenido()
+        self.transicion = {}
+
+    def createTransicion(self, simbolo, nodo):
+        self.transicion[simbolo] = nodo
+    
+    def getNombre(self):
+        str = ''
+        
+        if type(self.corazon) == list:
+            for elemento in self.corazon:
+                str += elemento + '\n'
+        
+        else:
+            str += self.corazon
+
+        str += '\n=====================\n'
+        
+        for elemento in self.resto:
+            if elemento in self.corazon:
+                continue
+            str += elemento + '\n'
+        return str
+    
+    def getContenido(self):
+        contenido = []
+        if type(self.corazon) == list:
+            for elemento in self.corazon:
+                contenido.append(elemento)
+        else:
+            contenido.append(self.corazon)
+        
+        for elemento in self.resto:
+            contenido.append(elemento)
+
+        return contenido
+
 class YAPAR(object):
 
     def  __init__(self, path):
@@ -12,11 +54,11 @@ class YAPAR(object):
         self.getTokens()
         self.getGrammar()
         
-        self.simbolosG = self.getSimbolosGramaticales()
-        self.arbol = self.getArbol()
+        # self.simbolosG = self.getSimbolosGramaticales()
+        # self.arbol = self.getArbol()
 
     def getTokens(self):
-        with open(self.path, 'r') as f:
+        with open(self.path, 'r', encoding='utf-8') as f:
             for line in f:
 
                 if line.startswith('%token'):
@@ -30,11 +72,12 @@ class YAPAR(object):
                     tokens = ln[1:]
                     for token in tokens:
                         self.ignored.append(token.strip('\n'))
+        self.tokens.append('ε')
 
     def getGrammar(self):
         gramatica = {}
 
-        with open(self.path, 'r') as f:
+        with open(self.path, 'r', encoding='utf-8') as f:
             data = f.read()
 
             data = data.split('%%')[1]
@@ -227,50 +270,69 @@ class YAPAR(object):
 
         G.render("test-output/prueba.gv", view=True)
 
-class N(object):
-    def __init__(self, corazon, resto, transicion = None):
-        self.corazon = corazon
-        self.resto = resto
-        self.nombre = self.getNombre()
-        self.contenido = self.getContenido()
-        self.transicion = {}
+    def primero(self, simbolo):
+        
+        primeros = []
+        # si es un terminal
+        if simbolo in self.tokens:
+            return [simbolo]
 
-    def createTransicion(self, simbolo, nodo):
-        self.transicion[simbolo] = nodo
-    
-    def getNombre(self):
-        str = ''
-        
-        if type(self.corazon) == list:
-            for elemento in self.corazon:
-                str += elemento + '\n'
-        
         else:
-            str += self.corazon
+            # si se tiene la produccion X -> ε
+            if simbolo in self.gramatica.keys() and self.gramatica[simbolo] == [['ε']]:
+                primeros.append('ε')
 
-        str += '\n=====================\n'
-        
-        for elemento in self.resto:
-            if elemento in self.corazon:
-                continue
-            str += elemento + '\n'
-            # str += elemento + '\n'
-        return str
+            # si se tiene la produccion X -> Y1Y2...Yn
+            else:
+                for produccion in self.gramatica[simbolo]:
+                    if produccion[0] != simbolo:
+                        n_primero = self.primero(produccion[0])
+
+                        # aplanar la lista
+                        if type(n_primero) == list:
+                            for e in n_primero:
+                                if e not in primeros:
+                                    primeros.append(e)
+                        else:
+                            if n_primero not in primeros:
+                                primeros.append(n_primero)
+        return primeros
     
-    def getContenido(self):
-        contenido = []
-        if type(self.corazon) == list:
-            for elemento in self.corazon:
-                contenido.append(elemento)
+    def siguiente(self, simbolo):
+        siguientes = []
         
-        else:
-            contenido.append(self.corazon)
-        
-        for elemento in self.resto:
-            contenido.append(elemento)
+        if simbolo == self.gramatica[list(self.gramatica.keys())[0]][0][0]:
+            siguientes.append('$')
 
-        return contenido
-    
+        for key in self.gramatica:
+            for produccion in self.gramatica[key]:
+                for elemento in produccion:
+                    if elemento == simbolo:
+                        index = produccion.index(elemento)
+                        if index == len(produccion)-1:
+                            if key == simbolo:
+                                continue
+                            else:
+                                n_siguientes = self.siguiente(key)
+                                print(n_siguientes, 'siguientes')
+                                for e in n_siguientes:
+                                    if e != 'ε' and e not in siguientes:
+                                        siguientes.append(e)
+                        else:
+                            n_primeros = self.primero(produccion[index+1])
+                            for e in n_primeros:
+                                print(e)
+                                if e != 'ε' and e not in siguientes:
+                                    siguientes.append(e)
 
+                            if 'ε' in n_primeros:
+                                n_siguientes = self.siguiente(key)
+                                for e in n_siguientes:
+                                    if e != 'ε' and e not in siguientes:
+                                        siguientes.append(e)
 
-yap = YAPAR('./slr-1.txt')
+        return siguientes
+
+yap = YAPAR('./slr-3.txt')
+primeros = yap.siguiente("e")
+print(primeros)
