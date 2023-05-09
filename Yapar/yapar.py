@@ -43,7 +43,7 @@ class N(object):
 
         return contenido
 
-class YAPAR(object):
+class Yapar(object):
 
     def  __init__(self, path):
         self.path = path
@@ -54,9 +54,38 @@ class YAPAR(object):
         self.getTokens()
         self.getGrammar()
         
-        # self.simbolosG = self.getSimbolosGramaticales()
-        # self.arbol = self.getArbol()
+    def checkErrors(self, yalex_rules):
+        errors = False
+        values = []
+        for key in yalex_rules:
+            temp = yalex_rules[key]
+            temp = temp.replace(' ', '')
+            values.append(temp)
 
+        # verificar que los tokens sean los mismos que en la gramatica
+        for key in self.tokens:
+            if key not in values and key != 'ε' and key not in self.ignored:
+                print('Error: El token ' + key + ' no esta en la gramatica')
+
+        # verificar que no hay mas tokens en la gramatica que en el yalex, exceptuando los tokens ignorados
+        contador = 0
+        len_values = len(values)
+        for key in self.tokens:
+            if key not in self.ignored:
+                contador += 1
+        if contador != len_values:
+            print('Error: La cantidad de tokens no coincide con la gramatica')
+
+
+
+        # verificar que los tokens esten escritos en mayusculas
+        for key in self.tokens:
+            if key != key.upper() and key != 'ε':
+                print('Error: El token ' + key + ' no es valido')
+        
+        if errors:
+            exit()
+        
     def getTokens(self):
         with open(self.path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -86,6 +115,11 @@ class YAPAR(object):
 
             # replace more than two spaces with only one
             data = re.sub(' +', ' ', data)
+
+        # revisar errores de sintaxis en data
+        if data.count(':') != data.count(';'):
+            print('Error: Error de sintaxis en la gramatica')
+            exit()
 
         expresiones = []
 
@@ -314,14 +348,12 @@ class YAPAR(object):
                                 continue
                             else:
                                 n_siguientes = self.siguiente(key)
-                                print(n_siguientes, 'siguientes')
                                 for e in n_siguientes:
                                     if e != 'ε' and e not in siguientes:
                                         siguientes.append(e)
                         else:
                             n_primeros = self.primero(produccion[index+1])
                             for e in n_primeros:
-                                print(e)
                                 if e != 'ε' and e not in siguientes:
                                     siguientes.append(e)
 
@@ -333,6 +365,19 @@ class YAPAR(object):
 
         return siguientes
 
-yap = YAPAR('./slr-3.txt')
-primeros = yap.siguiente("e")
-print(primeros)
+    def getPS(self):
+        primeros = {}
+        siguientes = {}
+
+        for key in self.gramatica:
+
+            primeros[key] = self.primero(key)
+
+            if "'" in key:
+                siguientes[key] = self.siguiente(key.replace("'", ""))
+            else:
+                siguientes[key] = self.siguiente(key)
+
+        print("primeros: ", primeros)
+        print("siguientes: ", siguientes)
+        return None

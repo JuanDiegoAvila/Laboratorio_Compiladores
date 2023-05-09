@@ -6,7 +6,6 @@ import pickle
 import sys
 sys.setrecursionlimit(5000)
 
-
 # Path al archivo YALex
 path = "./Yalex/YALex_3.txt"
 entrada = "./Yalex/Entrada 3.txt"

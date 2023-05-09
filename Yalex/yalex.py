@@ -127,6 +127,7 @@ class Yalex(object):
                     temp_key = temp_key.replace(" ", "")
                     temp_key = temp_key.replace("'", "")
                     temp_value = temp_value.replace(" print(\"", "").replace("\\n\")", "").replace("\")","")
+                    temp_value = temp_value.replace("return", "")
                     # agregar el token y su valor a la lista de tokens
                     self.rules[temp_key] = temp_value
 
