@@ -80,15 +80,22 @@ class Yapar(object):
 
 
 
-        # # verificar que los tokens esten escritos en mayusculas
-        # for key in self.tokens:
-        #     if key != key.upper() and key != 'ε':
-        #         print('Error: El token ' + key + ' no es valido')
+        # verificar que los tokens esten escritos en mayusculas
+        for key in self.tokens:
+            if key != key.upper() and key != 'ε':
+                print('Error: El token ' + key + ' no es valido')
         
         if errors:
             exit()
         
     def getTokens(self):
+        with open(self.path, 'r', encoding='utf-8') as f:
+            data = f.read()
+
+        if '%%' not in data:
+            print('Error: No se encontro el separador %%')
+            exit()
+            
         with open(self.path, 'r', encoding='utf-8') as f:
             for line in f:
 
