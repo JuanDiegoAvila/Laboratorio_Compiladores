@@ -53,6 +53,8 @@ class Yapar(object):
         
         self.getTokens()
         self.getGrammar()
+        # self.simbolosG = self.getSimbolosGramaticales()
+        # self.arbol = self.getArbol()
         
     def checkErrors(self, yalex_rules):
         errors = False
@@ -78,10 +80,10 @@ class Yapar(object):
 
 
 
-        # verificar que los tokens esten escritos en mayusculas
-        for key in self.tokens:
-            if key != key.upper() and key != 'ε':
-                print('Error: El token ' + key + ' no es valido')
+        # # verificar que los tokens esten escritos en mayusculas
+        # for key in self.tokens:
+        #     if key != key.upper() and key != 'ε':
+        #         print('Error: El token ' + key + ' no es valido')
         
         if errors:
             exit()
@@ -270,11 +272,20 @@ class Yapar(object):
 
                 for simbolo in self.simbolosG:
                     CORAZON, CERRADURA = self.ir_a(i, simbolo)
+                    
+                    # si el corazoon tiene la forma X -> ε • ignorarlo
 
                     if len(CERRADURA) == 0 and len(CORAZON) == 0:
                         continue
+                    
+                    # print(CORAZON)
+                    # prueba = CORAZON[0].split('->')
+                    # if prueba[1] == ' ε •':
+                    #     continue
 
                     if CERRADURA not in C:
+
+                        print(CERRADURA)
                         
                         nodo_nuevo = N(CORAZON, CERRADURA)
                         nodos.append(nodo_nuevo)
@@ -298,15 +309,24 @@ class Yapar(object):
                 break
 
         for n in nodos.copy():
+            # si el nombre del nodo tiene la forma X -> ε • ignorarlo
+            match = re.search(r'ε •', n.nombre)
+            if match:
+                continue
+
             G.node(n.nombre, shape='box')
             for key, value in n.transicion.items():
+                
+                if value == 'ε':
+                    continue
+
                 G.edge(n.nombre, key.nombre, label=value)
 
         G.render("test-output/prueba.gv", view=True)
 
     def primero(self, simbolo):
-        
         primeros = []
+
         # si es un terminal
         if simbolo in self.tokens:
             return [simbolo]
@@ -318,10 +338,19 @@ class Yapar(object):
 
             # si se tiene la produccion X -> Y1Y2...Yn
             else:
+                
                 for produccion in self.gramatica[simbolo]:
+                    
                     if produccion[0] != simbolo:
                         n_primero = self.primero(produccion[0])
+                        contador = 0
+                        
+                        while('ε' in n_primero and contador < len(produccion)-1):
+                            contador += 1
+                            n_primero.remove('ε')
+                            n_primero += self.primero(produccion[contador])
 
+                        
                         # aplanar la lista
                         if type(n_primero) == list:
                             for e in n_primero:
@@ -337,7 +366,7 @@ class Yapar(object):
         
         if simbolo == self.gramatica[list(self.gramatica.keys())[0]][0][0]:
             siguientes.append('$')
-
+        
         for key in self.gramatica:
             for produccion in self.gramatica[key]:
                 for elemento in produccion:
@@ -352,16 +381,40 @@ class Yapar(object):
                                     if e != 'ε' and e not in siguientes:
                                         siguientes.append(e)
                         else:
-                            n_primeros = self.primero(produccion[index+1])
-                            for e in n_primeros:
-                                if e != 'ε' and e not in siguientes:
-                                    siguientes.append(e)
+                            
+                            recorridos = 0
+                            epsilons = 0
+                        
+                            for i in range(index+1, len(produccion)):
+                                recorridos += 1
+                                n_primeros = self.primero(produccion[i])
+                                
+                                if 'ε' in n_primeros:
+                                    epsilons +=1 
 
-                            if 'ε' in n_primeros:
+                                for e in n_primeros:
+                                    if e != 'ε' and e not in siguientes:
+                                        siguientes.append(e)
+                                    
+                                if 'ε' not in n_primeros:
+                                    break
+                            
+                            if recorridos == epsilons:
                                 n_siguientes = self.siguiente(key)
                                 for e in n_siguientes:
                                     if e != 'ε' and e not in siguientes:
                                         siguientes.append(e)
+
+                            # n_primeros = self.primero(produccion[index+1])
+                            # for e in n_primeros:
+                            #     if e != 'ε' and e not in siguientes:
+                            #         siguientes.append(e)
+
+                            # if 'ε' in n_primeros:
+                            #     n_siguientes = self.siguiente(key)
+                            #     for e in n_siguientes:
+                            #         if e != 'ε' and e not in siguientes:
+                            #             siguientes.append(e)
 
         return siguientes
 
@@ -370,7 +423,6 @@ class Yapar(object):
         siguientes = {}
 
         for key in self.gramatica:
-
             primeros[key] = self.primero(key)
 
             if "'" in key:

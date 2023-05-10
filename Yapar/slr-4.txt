@@ -1,0 +1,26 @@
+%token a h c b g f
+
+%%
+
+S: 
+    a B D h
+;
+
+B:
+    c C
+;
+C :
+    b C
+    | ε
+;
+D :
+    E F
+;
+E :
+    g
+    | ε
+;
+F :
+    f
+    | ε
+;
