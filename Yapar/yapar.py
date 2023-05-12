@@ -9,6 +9,7 @@ class N(object):
         self.contenido = self.getContenido()
         self.transicion = {}
 
+
     def createTransicion(self, simbolo, nodo):
         self.transicion[simbolo] = nodo
     
@@ -53,11 +54,12 @@ class Yapar(object):
         
         self.getTokens()
         self.getGrammar()
-        # self.simbolosG = self.getSimbolosGramaticales()
-        # self.arbol = self.getArbol()
+        
+        self.simbolosG = self.getSimbolosGramaticales()
+        self.arbol = self.getArbol()
         
     def checkErrors(self, yalex_rules):
-        errors = False
+
         values = []
         for key in yalex_rules:
             temp = yalex_rules[key]
@@ -68,6 +70,7 @@ class Yapar(object):
         for key in self.tokens:
             if key not in values and key != 'ε' and key not in self.ignored:
                 print('Error: El token ' + key + ' no esta en la gramatica')
+                exit(0)
 
         # verificar que no hay mas tokens en la gramatica que en el yalex, exceptuando los tokens ignorados
         contador = 0
@@ -77,16 +80,14 @@ class Yapar(object):
                 contador += 1
         if contador != len_values:
             print('Error: La cantidad de tokens no coincide con la gramatica')
-
+            exit(0)
 
 
         # verificar que los tokens esten escritos en mayusculas
         for key in self.tokens:
             if key != key.upper() and key != 'ε':
                 print('Error: El token ' + key + ' no es valido')
-        
-        if errors:
-            exit()
+                exit(0)
         
     def getTokens(self):
         with open(self.path, 'r', encoding='utf-8') as f:
@@ -110,6 +111,11 @@ class Yapar(object):
                     tokens = ln[1:]
                     for token in tokens:
                         self.ignored.append(token.strip('\n'))
+        
+        if self.tokens == []:
+            print('Error: No se encontraron tokens')
+            exit()
+
         self.tokens.append('ε')
 
     def getGrammar(self):
@@ -126,8 +132,15 @@ class Yapar(object):
             data = re.sub(' +', ' ', data)
 
         # revisar errores de sintaxis en data
-        if data.count(':') != data.count(';'):
-            print('Error: Error de sintaxis en la gramatica')
+        dos_puntos = data.count(':')
+        punto_coma = data.count(';')
+
+        if dos_puntos > punto_coma:
+            print('Error: No hay la misma cantidad de ; que de :')
+            exit()
+
+        if dos_puntos < punto_coma:
+            print('Error: No hay la misma cantidad de : que de ;')
             exit()
 
         expresiones = []
@@ -159,6 +172,11 @@ class Yapar(object):
 
         for key in gramatica:
             self.gramatica[key] = gramatica[key]
+
+            if key in self.tokens:
+                # no puede haber un terminal en la cabeza de una produccion
+                print('Error: No puede haber un terminal en la cabeza de una produccion')
+                exit()
 
     def getSimbolosGramaticales(self):
         simbolos = []
@@ -292,8 +310,6 @@ class Yapar(object):
 
                     if CERRADURA not in C:
 
-                        print(CERRADURA)
-                        
                         nodo_nuevo = N(CORAZON, CERRADURA)
                         nodos.append(nodo_nuevo)
 
