@@ -160,7 +160,7 @@ with open('{entrada}', 'r') as file:
 new_script = new_script.format(header=header, trailer=trailer, entrada=entrada)
 
 # escribir el script en un archivo
-with open('./AL.py', 'w', encoding='utf-8') as file:
+with open('./Yalex/AL.py', 'w', encoding='utf-8') as file:
     file.write(new_script)
 
 

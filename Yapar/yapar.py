@@ -3,13 +3,13 @@ import graphviz as gv
 
 class N(object):
     def __init__(self, corazon, resto, transicion = None):
+        self.estado = ''
         self.corazon = corazon
         self.resto = resto
         self.nombre = self.getNombre()
         self.contenido = self.getContenido()
         self.transicion = {}
-
-
+        
     def createTransicion(self, simbolo, nodo):
         self.transicion[simbolo] = nodo
     
@@ -57,6 +57,8 @@ class Yapar(object):
         
         self.simbolosG = self.getSimbolosGramaticales()
         self.arbol = self.getArbol()
+
+        self.getTabla()
         
     def checkErrors(self, yalex_rules):
 
@@ -181,7 +183,8 @@ class Yapar(object):
     def getSimbolosGramaticales(self):
         simbolos = []
         for key in self.gramatica:
-            simbolos.append(key)
+            if key not in simbolos:
+                simbolos.append(key)
             for produccion in self.gramatica[key]:
                 for simbolo in produccion:
                     if simbolo not in simbolos:
@@ -331,6 +334,13 @@ class Yapar(object):
             if agregados == 0:
                 break
 
+        contador = 0
+        for n in nodos.copy():
+            n.estado = 'I' + str(contador) 
+            contador += 1
+
+            n.nombre = n.estado + '\n' + n.nombre
+
         for n in nodos.copy():
             # si el nombre del nodo tiene la forma X -> ε • ignorarlo
             match = re.search(r'ε •', n.nombre)
@@ -342,10 +352,24 @@ class Yapar(object):
                 
                 if value == 'ε':
                     continue
-
+            
                 G.edge(n.nombre, key.nombre, label=value)
+            
+            if n.estado == 'I1':
 
-        G.render("test-output/prueba.gv", view=True)
+                # agregar un nodo que tenga el texto de aceptacion y crear una transicion a el con $
+                nodo_aceptacion = N('Aceptacion', ['Aceptacion'])
+                nodo_aceptacion.nombre = 'Aceptacion'
+
+                n.createTransicion(nodo_aceptacion, '$')
+
+                nodos.append(nodo_aceptacion)
+                G.node(nodo_aceptacion.nombre, shape='plaintext')
+                G.edge(n.nombre, nodo_aceptacion.nombre, label='$')
+
+        self.nodos = nodos
+
+        # G.render("test-output/prueba.gv", view=True)
 
     def primero(self, simbolo):
         primeros = []
@@ -428,17 +452,6 @@ class Yapar(object):
                                     if e != 'ε' and e not in siguientes:
                                         siguientes.append(e)
 
-                            # n_primeros = self.primero(produccion[index+1])
-                            # for e in n_primeros:
-                            #     if e != 'ε' and e not in siguientes:
-                            #         siguientes.append(e)
-
-                            # if 'ε' in n_primeros:
-                            #     n_siguientes = self.siguiente(key)
-                            #     for e in n_siguientes:
-                            #         if e != 'ε' and e not in siguientes:
-                            #             siguientes.append(e)
-
         return siguientes
 
     def getPS(self):
@@ -455,4 +468,118 @@ class Yapar(object):
 
         print("primeros: ", primeros)
         print("siguientes: ", siguientes)
+        return None
+    
+    def getGramaticaList(self):
+        conteo = 0
+        gramatica_list = {}
+        for key, value in self.gramatica.items():
+            if conteo == 0:
+                conteo += 1
+                pass
+            else:
+                for values in value:
+                    produccion = key + ' -> ' + ' '.join(values)
+
+                    gramatica_list[conteo] = produccion
+                    conteo += 1
+        
+        return gramatica_list
+
+    
+    def getTabla(self):
+        C = {}
+        for nodo in self.nodos:
+            if nodo.estado != '':
+                C[nodo.estado] = nodo
+
+        # 2.- 
+        # a) Si [A -> α • aβ] está en Ii y GOTO(Ii, a) = Ij entonces M[i, a] = “desplazar j”
+        # b) Si [A -> α •] está en Ii entonces M[i, a] = “reducir A -> α" para toda a en SIGUIENTE(A)
+        # c) Si [S' -> S •] está en Ii entonces M[i, $] = “aceptar”
+        # 3.-
+        # Las transiciones de GOTO para el estado i se construyen para todos los no terminales A usando la regla
+        # si GOTO(Ii, A) = Ij entonces M[i, A] = j
+        # 4.- Si no se cumple con las reglas 2 y 3 se deja como error
+        # 5.- El estado inicial es I0, que contiene el item S' -> • S
+
+        # ACCEPT
+        tabla_accion = {}
+        for nodo in self.nodos.copy():
+            estado = nodo.estado.replace('I', '')
+
+            if estado not in tabla_accion and nodo.estado != '':
+                tabla_accion[estado] = {}
+            
+            # si tiene la transicion $ entonces es aceptacion
+            for key, value in nodo.transicion.items():
+                if '$' == value:
+                    
+                    tabla_accion[estado]['$'] = 'aceptar'
+
+
+        # DESPLAZAR
+        for nodo in self.nodos.copy():
+            # Si [A -> α • aβ] está en Ii y GOTO(Ii, a) = Ij entonces M[i, a] = “desplazar j”
+            for key, value in nodo.transicion.items():
+                if value in self.tokens and value != 'ε':
+                    estado = nodo.estado.replace('I', '')
+                    if estado not in tabla_accion:
+                        tabla_accion[estado] = {}
+
+                    tabla_accion[estado][value] = 's'+ key.estado.replace('I', '')
+        
+        self.gramaticaList = self.getGramaticaList()
+
+        # REDUCIR
+        for nodo in self.nodos.copy():
+            # Si [A -> α •] está en Ii entonces M[i, a] = “reducir A -> α" para toda a en SIGUIENTE(A)
+            if nodo.estado != '':
+                corazon = nodo.corazon
+                if type(corazon) != list:
+                    corazon = [corazon]
+
+                for produccion in corazon:
+                    partes = produccion.split(' -> ')
+                    izquierda = partes[0]
+                    derecha = partes[1].split(' ')
+
+                    if '•' in derecha[len(derecha)-1]:
+                        siguiente = self.siguiente(izquierda)
+                        for simbolo in siguiente:
+                            if simbolo != 'ε':
+                                pass
+
+                            for key, value in self.gramaticaList.items():
+                                
+                                prod_temp = derecha.copy()
+                                prod_temp.remove('•')
+
+                                if izquierda + ' -> ' + ' '.join(prod_temp) == value:
+                                    tabla_accion[nodo.estado.replace('I', '')][simbolo] = 'r' + str(key)
+                                    break
+
+        # self.imprimirTabla(tabla_accion)
+        # GOTO
+        tabla_goto = {}
+        for nodo in self.nodos.copy():
+            for key, value in nodo.transicion.items():
+                if value not in self.tokens and value != 'ε' and value != '$':
+                    estado = nodo.estado.replace('I', '')
+                    if estado not in tabla_goto:
+                        tabla_goto[estado] = {}
+
+                    tabla_goto[estado][value] = key.estado.replace('I', '')
+
+        self.imprimirTabla(tabla_goto)
+
+        self.tabla_analisis = {}
+        self.tabla_analisis['accion'] = tabla_accion
+        self.tabla_analisis['ir_A'] = tabla_goto
+                                    
+    def imprimirTabla(self, tabla):
+        
+        for key, value in tabla.items():
+            print(key, value)
+
         return None

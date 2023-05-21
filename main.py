@@ -13,7 +13,7 @@ YALEX = Yalex(path_yalex)
 YAPAR = Yapar(path_yapar)
 
 YAPAR.checkErrors(YALEX.rules)
-YAPAR.getPS()
+# YAPAR.getPS()
 # YAPAR.siguiente('E')
 
 
