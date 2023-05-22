@@ -1,5 +1,6 @@
 
 import pickle
+from comunicador import Comunicador
 
 None
 
@@ -16,14 +17,12 @@ simulacion = None
 with open('./Yalex/pickle/simulacion.pickle', 'rb') as f:
     simulacion = pickle.load(f)
 
-comunicador = None
-with open('./pickle/comunicador.pickle', 'rb') as f:
-    comunicador = pickle.load(f)
 
 rules = YALEX.rules
 tokens = YALEX.tokens
 
 token_keys = tokens.keys()
+
 
 
 # Hacer la simulacion de el automata con cada cadena de entrada
@@ -50,6 +49,7 @@ with open('./Yapar/entrada1.txt', 'r') as file:
                             output.append(value)
                             print(value)
                             existe = True
+                            
                         break
 
                     if token == key and not existe:
@@ -57,7 +57,9 @@ with open('./Yapar/entrada1.txt', 'r') as file:
                             output.append(value)
                             print(value)
                             existe = True
+                            
                         break
+                        
             
                 if not existe and token not in token_keys and token != '':
                     posicion = 0
@@ -68,6 +70,7 @@ with open('./Yapar/entrada1.txt', 'r') as file:
                     output.append(string)
                     print(string)
             indice += 1
+
 
     # escribir archivo con todos los elementos de output
     with open('./Yalex/Output.txt', 'w', encoding='utf-8') as file:

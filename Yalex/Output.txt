@@ -1,6 +1,1 @@
-Error lexico en la linea 1 en la posicion 0: 'asdlfkjasdfxyz' no es un token valido
-Número Decimal 
-Error lexico en la linea 1 en la posicion 22: '.' no es un token valido
-Número Entero 
-Error lexico en la linea 1 en la posicion 27: '"asfc ' no es un token valido
-Error lexico en la linea 1 en la posicion 33: '&' no es un token valido
+  ID 

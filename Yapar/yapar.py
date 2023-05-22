@@ -571,7 +571,7 @@ class Yapar(object):
 
                     tabla_goto[estado][value] = key.estado.replace('I', '')
 
-        self.imprimirTabla(tabla_goto)
+        # self.imprimirTabla(tabla_goto)
 
         self.tabla_analisis = {}
         self.tabla_analisis['accion'] = tabla_accion

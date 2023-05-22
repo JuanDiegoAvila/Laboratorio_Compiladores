@@ -1,14 +1,14 @@
-from Yalex.yalex import * 
+import sys
+from Yalex.yalex import *
 from Automatas.postfix import *
 from Automatas.thompson import * 
 from Automatas.simulacion import Simulacion
 import pickle
-import sys
 sys.setrecursionlimit(5000)
 
 # Path al archivo YALex
-path = "./Yalex/YALex_3.txt"
-entrada = "./Yalex/Entrada 3.txt"
+path = "./Yapar/yal1.txt"
+entrada = "./Yapar/entrada1.txt"
 
 YALEX = Yalex(path)
 automatas = []
@@ -66,15 +66,15 @@ nodos.append(final)
 
 nodos = order_nodos(nodos[0])
 
-with open('./pickle/nodos.pickle', 'wb') as f:
+with open('./Yalex/pickle/nodos.pickle', 'wb') as f:
     pickle.dump(nodos, f)
 
 
-with open('./pickle/YALEX.pickle', 'wb') as f:
+with open('./Yalex/pickle/YALEX.pickle', 'wb') as f:
     pickle.dump(YALEX, f)
 
 simulacion = Simulacion(nodos)
-with open('./pickle/simulacion.pickle', 'wb') as f:
+with open('./Yalex/pickle/simulacion.pickle', 'wb') as f:
     pickle.dump(simulacion, f)
 
 header = YALEX.header if YALEX.header is not None else None
@@ -84,26 +84,29 @@ trailer = YALEX.trailer if YALEX.trailer is not None else None
 
 new_script = """
 import pickle
+from comunicador import Comunicador
 
 {header}
 
 # Cargar el archivo con el arreglo nodos
 nodos = None
-with open('./pickle/nodos.pickle', 'rb') as f:
+with open('./Yalex/pickle/nodos.pickle', 'rb') as f:
     nodos = pickle.load(f)
 
 YALEX = None
-with open('./pickle/YALEX.pickle', 'rb') as f:
+with open('./Yalex/pickle/YALEX.pickle', 'rb') as f:
     YALEX = pickle.load(f)
 
 simulacion = None
-with open('./pickle/simulacion.pickle', 'rb') as f:
+with open('./Yalex/pickle/simulacion.pickle', 'rb') as f:
     simulacion = pickle.load(f)
+
 
 rules = YALEX.rules
 tokens = YALEX.tokens
 
 token_keys = tokens.keys()
+
 
 
 # Hacer la simulacion de el automata con cada cadena de entrada
@@ -130,6 +133,7 @@ with open('{entrada}', 'r') as file:
                             output.append(value)
                             print(value)
                             existe = True
+                            
                         break
 
                     if token == key and not existe:
@@ -137,7 +141,9 @@ with open('{entrada}', 'r') as file:
                             output.append(value)
                             print(value)
                             existe = True
+                            
                         break
+                        
             
                 if not existe and token not in token_keys and token != '':
                     posicion = 0
@@ -148,6 +154,7 @@ with open('{entrada}', 'r') as file:
                     output.append(string)
                     print(string)
             indice += 1
+
 
     # escribir archivo con todos los elementos de output
     with open('./Yalex/Output.txt', 'w', encoding='utf-8') as file:
@@ -160,7 +167,7 @@ with open('{entrada}', 'r') as file:
 new_script = new_script.format(header=header, trailer=trailer, entrada=entrada)
 
 # escribir el script en un archivo
-with open('./Yalex/AL.py', 'w', encoding='utf-8') as file:
+with open('./AL.py', 'w', encoding='utf-8') as file:
     file.write(new_script)
 
 
