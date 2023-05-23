@@ -556,7 +556,16 @@ class Yapar(object):
                                 prod_temp.remove('•')
 
                                 if izquierda + ' -> ' + ' '.join(prod_temp) == value:
-                                    tabla_accion[nodo.estado.replace('I', '')][simbolo] = 'r' + str(key)
+                                    if simbolo not in tabla_accion[nodo.estado.replace('I', '')]:
+                                        tabla_accion[nodo.estado.replace('I', '')][simbolo] = 'r' + str(key)
+                                    else:
+                                        # si hay un match con r en el espacio es error de reduccion/reduccion
+                                        if simbolo in tabla_accion[nodo.estado.replace('I', '')] and [nodo.estado.replace('I', '')][simbolo][0] == 'r':
+                                            print('Error: Conflicto en la tabla de analisis. Error reduccion/reduccion')
+
+                                        elif simbolo in tabla_accion[nodo.estado.replace('I', '')] and  tabla_accion[nodo.estado.replace('I', '')][simbolo][0] == 's':
+                                            print('Error: Conflicto en la tabla de analisis. Error reduccion/desplazamiento')
+                                        exit(0)
                                     break
 
         # self.imprimirTabla(tabla_accion)

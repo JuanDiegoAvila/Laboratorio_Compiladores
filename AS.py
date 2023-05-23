@@ -1,4 +1,5 @@
 
+
 import pickle
 from comunicador import Comunicador
 import AL as AL
@@ -20,21 +21,24 @@ comunicador = None
 with open('./pickle/comunicador.pickle', 'rb') as f:
     comunicador = pickle.load(f)
 
+ANALIZADOR_LEXICO = AL.AL()
 
-W = ['ID','PLUS','ID','TIMES','ID','$']
+
+# W = ['ID','PLUS','ID','TIMES','ID','$']
+W = []
 PILA = [0]
+a = ANALIZADOR_LEXICO.getNext()
 
 ACCION = YAPAR.tabla_analisis['accion']
 IR_A = YAPAR.tabla_analisis['ir_A']
 
 contador = 0
 
+
 while True:
     S = str(PILA[-1])
     # a = W[0]
-    a = AL.getNext()
-
-    print(S, a, PILA)
+    # a = ANALIZADOR_LEXICO.getNext()
 
     if a in ACCION[S]:
 
@@ -44,7 +48,7 @@ while True:
             accion = ACCION[S][a].split('s')[1]
             PILA.append(int(accion))
             # W = W[1:]
-            a = AL.getNext()
+            a = ANALIZADOR_LEXICO.getNext()
 
         elif ACCION[S][a][0] == 'r':
 
@@ -82,4 +86,5 @@ while True:
     else:
         print('error')
         break
+
 
