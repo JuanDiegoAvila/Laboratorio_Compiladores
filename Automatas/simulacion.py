@@ -13,7 +13,7 @@ class Simulacion(object):
 
         self.aceptado = False
         self.movimientos = ""
-        self.linea = 0
+        self.linea = 1
         self.entrada = ''
         self.puntero = 0
 
@@ -198,7 +198,8 @@ class Simulacion(object):
             c = self.sigCarP()
         
 
-        return None, True
+        if c == '@':
+            return None, True
 
     def simulacionAFN_YALEX(self, expresion):
         self.contador = 0

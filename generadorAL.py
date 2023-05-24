@@ -121,39 +121,43 @@ class AL(object):
         if 'Error' in self.output[0]:
             print(self.output[0])
             exit()
-
-        temp = self.output[0].replace(' ', '')
         
+        temp = self.output[0].replace(' ', '')
         return temp
         
-
 
     def analizador_lexico(self):
 
         # Hacer la simulacion de el automata con cada cadena de entrada
+        cantidad_lineas = 1
 
         with open('{entrada}') as file:
             
             for line in file:
-                line = line
-                puntero = self.simulacion.getPuntero()
-                # puntero = puntero -1 if puntero > 0 else puntero
-                
-                
-                self.suma_puntero += puntero
+                if self.simulacion.linea == cantidad_lineas:
+                    line = line
+                    puntero = self.simulacion.getPuntero()
+                    # puntero = puntero -1 if puntero > 0 else puntero
+                    
+                    
+                    self.suma_puntero += puntero
 
-                # agarrar la linea a partir del puntero 
-                linea = line[self.suma_puntero:]
+                    # agarrar la linea a partir del puntero 
+                    linea = line[self.suma_puntero:]
+                    print(repr(linea))
 
-                self.simulacion.setEntrada(linea,  self.tokens.keys(),  self.rules)
+                    self.simulacion.setEntrada(linea,  self.tokens.keys(),  self.rules)
 
-                token, termino =  self.simulacion.simulacionAFN_YALEX_PUNTERO()
+                    token, termino= self.simulacion.simulacionAFN_YALEX_PUNTERO()
+                    
+                    if token != None:
+                        self.output = token
                 
-                if token != None:
-                    self.output = token
+                        
+                cantidad_lineas += 1
                 
-                if termino:
-                    self.output = ['$']
+        if termino:
+            self.output = ['$']
     
 
 {trailer}
