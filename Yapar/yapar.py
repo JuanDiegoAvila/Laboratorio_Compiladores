@@ -54,6 +54,7 @@ class Yapar(object):
         
         self.getTokens()
         self.getGrammar()
+        self.gramaticaList = self.getGramaticaList()
         
         self.simbolosG = self.getSimbolosGramaticales()
         self.arbol = self.getArbol()
@@ -355,8 +356,11 @@ class Yapar(object):
             
                 G.edge(n.nombre, key.nombre, label=value)
             
-            if n.estado == 'I1':
-
+            # if n.estado == 'I1':
+            # si el corazon del elemento tiene S' -> S •
+           
+            if list(self.gramatica.keys())[0] + ' -> ' + ' '.join(self.gramatica[list(self.gramatica.keys())[0]][0]) + ' •' in n.corazon:
+            
                 # agregar un nodo que tenga el texto de aceptacion y crear una transicion a el con $
                 nodo_aceptacion = N('Aceptacion', ['Aceptacion'])
                 nodo_aceptacion.nombre = 'Aceptacion'
@@ -474,10 +478,12 @@ class Yapar(object):
         conteo = 0
         gramatica_list = {}
         for key, value in self.gramatica.items():
-            if conteo == 0:
-                conteo += 1
-                pass
-            else:
+            # if conteo == 0:
+            #     for values in value: 
+            #         produccion = key + ' -> ' + ' '.join(values)
+            #         gramatica_list[conteo] = produccion
+            #         conteo += 1
+            # else:
                 for values in value:
                     produccion = key + ' -> ' + ' '.join(values)
 
@@ -529,7 +535,7 @@ class Yapar(object):
 
                     tabla_accion[estado][value] = 's'+ key.estado.replace('I', '')
         
-        self.gramaticaList = self.getGramaticaList()
+        
 
         # REDUCIR
         for nodo in self.nodos.copy():

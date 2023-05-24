@@ -50,8 +50,6 @@ with open('./pickle/comunicador.pickle', 'rb') as f:
 
 ANALIZADOR_LEXICO = AL.AL()
 
-
-# W = ['ID','PLUS','ID','TIMES','ID','$']
 W = []
 PILA = [0]
 a = ANALIZADOR_LEXICO.getNext()
@@ -76,6 +74,8 @@ while True:
             PILA.append(int(accion))
             # W = W[1:]
             a = ANALIZADOR_LEXICO.getNext()
+            while(a in YAPAR.ignored):
+                a = ANALIZADOR_LEXICO.getNext()
 
         elif ACCION[S][a][0] == 'r':
 

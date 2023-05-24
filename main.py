@@ -42,4 +42,4 @@ with open('./pickle/comunicador.pickle', 'wb') as f:
 subprocess.run(["python", "generadorAS.py"])
 subprocess.run(["python", "generadorAL.py"])
 subprocess.run(["python", "AS.py"])
-subprocess.run(["python", "AL.py"])
+# subprocess.run(["python", "AL1.py"])

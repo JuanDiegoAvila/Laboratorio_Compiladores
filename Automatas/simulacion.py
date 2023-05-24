@@ -11,6 +11,12 @@ class Simulacion(object):
         if tipo:
             self.aceptado, self.movimientos = self.simulacionAFN() if tipo == "AFN" else self.simulacionAFD()
 
+        self.aceptado = False
+        self.movimientos = ""
+        self.linea = 0
+        self.entrada = ''
+        self.puntero = 0
+
     def crearVisitados(self, nodos):
         visitados = {}
         for nodo in nodos:
@@ -21,7 +27,6 @@ class Simulacion(object):
         car = expresion[self.contador]
         self.contador += 1
         return car
-
 
     def e_closure(self, nodos):
 
@@ -50,8 +55,7 @@ class Simulacion(object):
                     self.visitados[s_nodo] = True
                     n_nodos.append(s_nodo)
 
-        return n_nodos
-    
+        return n_nodos  
 
     def simulacionAFN(self):
         expresion = [caracter for caracter in self.expresion]
@@ -91,7 +95,110 @@ class Simulacion(object):
                     self.visitados[s_nodo] = True
                     n_nodos.append(s_nodo)
         return n_nodos
+
+    def setEntrada(self, entrada, token_keys, rules):
+        self.entrada = entrada
+        self.entrada += ' @'
+        self.linea += 1
+        self.token_keys = token_keys
+        self.rules = rules
+        self.puntero = 0
+
+    def sigCarP(self):
+        car = self.entrada[self.puntero]
+        self.puntero += 1
+        return car
     
+    def getPuntero(self):
+        return self.puntero
+    
+    def verificar(self, aceptado, texto_reconocido):
+        output = []
+        # print('==================ACEPTADO==================')
+        # print('aceptado: ', aceptado)
+        # print('texto_reconocido: ', texto_reconocido)
+        # print('====================================')
+        for token in aceptado:
+            existe = False
+
+            for key, value in self.rules.items():
+                if texto_reconocido == key:
+                    if value != '':
+                        output.append(value)
+                        existe = True
+
+                    break
+                if token == key and not existe:
+                    if value != '':
+                        output.append(value)
+                        existe = True
+
+                    break
+                    
+        
+            if not existe and token not in self.token_keys and token != '':
+                posicion = 0
+                for i in range(self.linea):
+                    posicion += len(texto_reconocido[i])
+
+                string = 'Error lexico en la linea '+ str(self.linea +1) +' en la posicion ' + str(posicion)+': ' + repr(token) + ' no es un token valido'
+                output.append(string)
+
+        return output
+        
+    
+    # simulacion afn del yalex con punteros para que siga recibiendo caracteres hasta que reconozca algo
+    def simulacionAFN_YALEX_PUNTERO(self):
+    
+        S = self.e_closure(self.nodos[0])
+        c = self.sigCarP()
+
+        
+        reconocidos = []
+        temp = ''
+        temp2 = ''
+
+        texto_reconocido = []
+        while (c != '@'):
+
+            move = self.move_mega_automata(S, c)
+
+            if move == []:
+
+                if self.puntero > 1:
+                    self.puntero -= 1
+
+                nodos_reconocidos = []
+                for s in S:
+                    if s.final_yalex:
+                        nodos_reconocidos.append(s.valor_diccionario)
+
+                if len(nodos_reconocidos) > 0 and nodos_reconocidos[0] != []:
+                    temp = nodos_reconocidos
+                else:
+                    temp = [temp]
+
+                S = self.e_closure(self.nodos[0])
+
+                aceptado = temp
+                textoreconocido = temp2 if temp2 != '' else c
+
+                temp = ''
+                temp2 = ''
+
+                move = self.move_mega_automata(S, c)
+
+                return self.verificar(aceptado, textoreconocido), False
+
+            temp += c
+            temp2 += c
+
+            S = self.e_closure(move)
+            c = self.sigCarP()
+        
+
+        return None, True
+
     def simulacionAFN_YALEX(self, expresion):
         self.contador = 0
         expresion = [caracter for caracter in expresion]

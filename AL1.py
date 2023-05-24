@@ -1,6 +1,5 @@
 
 import pickle
-from comunicador import Comunicador
 
 None
 
@@ -43,7 +42,7 @@ class AL(object):
 
         # Hacer la simulacion de el automata con cada cadena de entrada
 
-        with open('./Yapar/entrada1.txt') as file:
+        with open('{entrada}') as file:
             
             for line in file:
                 line = line
@@ -65,6 +64,4 @@ class AL(object):
                 
                 if termino:
                     self.output = ['$']
-    
 
-None
