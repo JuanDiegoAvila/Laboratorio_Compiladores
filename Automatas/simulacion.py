@@ -99,7 +99,6 @@ class Simulacion(object):
     def setEntrada(self, entrada, token_keys, rules):
         self.entrada = entrada
         self.entrada += ' @'
-        self.linea += 1
         self.token_keys = token_keys
         self.rules = rules
         self.puntero = 0
@@ -107,6 +106,8 @@ class Simulacion(object):
     def sigCarP(self):
         car = self.entrada[self.puntero]
         self.puntero += 1
+        if car == '\n':
+            self.linea += 1
         return car
     
     def getPuntero(self):
@@ -136,12 +137,12 @@ class Simulacion(object):
                     break
                     
         
-            if not existe and token not in self.token_keys and token != '':
+            if not existe and token not in self.token_keys:
                 posicion = 0
                 for i in range(self.linea):
-                    posicion += len(texto_reconocido[i])
-
-                string = 'Error lexico en la linea '+ str(self.linea +1) +' en la posicion ' + str(posicion)+': ' + repr(token) + ' no es un token valido'
+                    posicion += len(texto_reconocido)
+                # +' en la posicion ' + str(posicion)+'
+                string = 'Error lexico en la linea '+ str(self.linea +1)+' : ' + repr(texto_reconocido) + ' no es un token valido'
                 output.append(string)
 
         return output

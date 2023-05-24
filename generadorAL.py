@@ -117,8 +117,13 @@ class AL(object):
     def getNext(self):
         self.next = True
         self.analizador_lexico()
+
+        if 'Error' in self.output[0]:
+            print(self.output[0])
+            exit()
+
         temp = self.output[0].replace(' ', '')
-        print(temp)
+        
         return temp
         
 
