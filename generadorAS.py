@@ -4,8 +4,8 @@ from Yapar.yapar import *
 from Yalex.yalex import *
 sys.setrecursionlimit(5000)
 
-path_yalex = "./Yapar/yal1.txt"
-path_yapar = "./Yapar/slr-1.txt"
+path_yalex = "./Yapar/yal2.txt"
+path_yapar = "./Yapar/slr-2.txt"
 
 YALEX = Yalex(path_yalex)
 YAPAR = Yapar(path_yapar)
@@ -106,14 +106,18 @@ while True:
             # # agregar el lado izquierdo a la salida
             # print(lado_izquierdo)
 
-        elif ACCION[S][a] == 'aceptar':
+        elif ACCION[S][a] == 'aceptar' and ANALIZADOR_LEXICO.error == False:
             print('aceptado')
             break
 
     else:
+        
         print('Error sintactico en la entrada')
         break
 
+    if ANALIZADOR_LEXICO.error:
+        print('Error lexico en la entrada')
+        break
 
 """
 

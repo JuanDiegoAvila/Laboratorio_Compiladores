@@ -79,12 +79,16 @@ while True:
             # # agregar el lado izquierdo a la salida
             # print(lado_izquierdo)
 
-        elif ACCION[S][a] == 'aceptar':
+        elif ACCION[S][a] == 'aceptar' and ANALIZADOR_LEXICO.error == False:
             print('aceptado')
             break
 
     else:
+        
         print('Error sintactico en la entrada')
         break
 
+    if ANALIZADOR_LEXICO.error:
+        print('Error lexico en la entrada')
+        break
 

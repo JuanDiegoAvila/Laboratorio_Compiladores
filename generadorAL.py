@@ -7,13 +7,14 @@ import pickle
 sys.setrecursionlimit(5000)
 
 # Path al archivo YALex
-path = "./Yapar/yal1.txt"
+path = "./Yapar/yal2.txt"
 entrada = "./Yapar/entrada1.txt"
 
 YALEX = Yalex(path)
 automatas = []
 
 prioridad = 1
+
 # Crear un atomata por cada token
 for token in YALEX.tokens:
     expresion = YALEX.tokens[token]
@@ -91,8 +92,12 @@ from comunicador import Comunicador
 class AL(object):
     def __init__(self):
         self.output = []
+        self.error = False
         self.actual = 0
         self.next = False
+        self.aceptar = False
+        self.cantidad_lineas = self.cantidadLineas()
+        self.linea_actual = 1
 
         # Cargar el archivo con el arreglo nodos
         self.nodos = None
@@ -112,7 +117,13 @@ class AL(object):
         self.token_keys = self.tokens.keys()
         self.suma_puntero = 0
 
-        
+    def cantidadLineas(self):
+        cantidad_lineas = 0
+        with open('{entrada}') as file:
+            for line in file:
+                cantidad_lineas += 1
+        return cantidad_lineas
+
 
     def getNext(self):
         self.next = True
@@ -120,9 +131,16 @@ class AL(object):
 
         if 'Error' in self.output[0]:
             print(self.output[0])
-            exit()
-        
+            self.output = []
+            self.error = True
+            self.analizador_lexico()
+
+        if self.output[0] == 'cambio de linea':
+            self.output = []
+            self.analizador_lexico()
+
         temp = self.output[0].replace(' ', '')
+        print(temp)
         return temp
         
 
@@ -130,34 +148,44 @@ class AL(object):
 
         # Hacer la simulacion de el automata con cada cadena de entrada
         cantidad_lineas = 1
+        termino = False
+
 
         with open('{entrada}') as file:
             
             for line in file:
+            
                 if self.simulacion.linea == cantidad_lineas:
-                    line = line
+                    line = line.replace('\\n', ' \\n')
                     puntero = self.simulacion.getPuntero()
-                    # puntero = puntero -1 if puntero > 0 else puntero
-                    
-                    
+                
                     self.suma_puntero += puntero
 
                     # agarrar la linea a partir del puntero 
                     linea = line[self.suma_puntero:]
-                    print(repr(linea))
 
-                    self.simulacion.setEntrada(linea,  self.tokens.keys(),  self.rules)
 
-                    token, termino= self.simulacion.simulacionAFN_YALEX_PUNTERO()
+                    if linea == ' \\n':
+                        self.linea_actual += 1
+                        self.simulacion.linea += 1
+                        self.output = ['cambio de linea']
+                        self.suma_puntero = 0
+                        self.simulacion.setPuntero(0)
+
+                        if self.linea_actual > self.cantidad_lineas:
+                            self.output = ['$']
+
+                        return
+                        
+
+                    self.simulacion.setEntrada(linea, self.tokens.keys(), self.rules)
+
+                    token, termino = self.simulacion.simulacionAFN_YALEX_PUNTERO()
                     
                     if token != None:
                         self.output = token
                 
-                        
                 cantidad_lineas += 1
-                
-        if termino:
-            self.output = ['$']
     
 
 {trailer}

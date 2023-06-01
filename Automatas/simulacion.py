@@ -106,12 +106,16 @@ class Simulacion(object):
     def sigCarP(self):
         car = self.entrada[self.puntero]
         self.puntero += 1
-        if car == '\n':
-            self.linea += 1
+
+        # if car == '\n':
+        #     self.linea += 1
         return car
     
     def getPuntero(self):
         return self.puntero
+
+    def setPuntero(self, puntero):
+        self.puntero = puntero
     
     def verificar(self, aceptado, texto_reconocido):
         output = []
