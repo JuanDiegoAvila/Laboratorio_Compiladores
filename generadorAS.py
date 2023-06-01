@@ -2,13 +2,15 @@ import pickle
 import sys
 from Yapar.yapar import *
 from Yalex.yalex import *
+import sys
 sys.setrecursionlimit(5000)
 
-path_yalex = "./Yapar/yal2.txt"
-path_yapar = "./Yapar/slr-2.txt"
+path_yalex = "./Yapar/yal3.txt"
+path_yapar = "./Yapar/slr-3.txt"
 
 YALEX = Yalex(path_yalex)
 YAPAR = Yapar(path_yapar)
+
 
 YAPAR.checkErrors(YALEX.rules)
 
@@ -47,6 +49,7 @@ with open('./Yapar/pickle/YAPAR.pickle', 'rb') as f:
 comunicador = None
 with open('./pickle/comunicador.pickle', 'rb') as f:
     comunicador = pickle.load(f)
+
 
 ANALIZADOR_LEXICO = AL.AL()
 

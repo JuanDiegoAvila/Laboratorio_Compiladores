@@ -21,6 +21,7 @@ comunicador = None
 with open('./pickle/comunicador.pickle', 'rb') as f:
     comunicador = pickle.load(f)
 
+
 ANALIZADOR_LEXICO = AL.AL()
 
 W = []

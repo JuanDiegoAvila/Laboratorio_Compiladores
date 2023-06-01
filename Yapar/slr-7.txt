@@ -1,0 +1,27 @@
+%token ID
+%token PLUS
+%token TIMES
+%token LPAREN RPAREN
+%token WS
+IGNORE WS
+
+%%
+
+e:
+      t et
+;
+et:
+      PLUS t et
+    | ε
+;
+t:
+      f te
+;
+te:
+      TIMES f te
+    | ε
+;
+f:
+      LPAREN e RPAREN
+    | ID
+;

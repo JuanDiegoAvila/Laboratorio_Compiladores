@@ -7,8 +7,8 @@ import pickle
 sys.setrecursionlimit(5000)
 
 # Path al archivo YALex
-path = "./Yapar/yal2.txt"
-entrada = "./Yapar/entrada1.txt"
+path = "./Yapar/yal3.txt"
+entrada = "./Yapar/entrada3.txt"
 
 YALEX = Yalex(path)
 automatas = []
@@ -139,6 +139,8 @@ class AL(object):
             self.output = []
             self.analizador_lexico()
 
+        # print(self.output)
+
         temp = self.output[0].replace(' ', '')
         print(temp)
         return temp
@@ -164,6 +166,10 @@ class AL(object):
                     # agarrar la linea a partir del puntero 
                     linea = line[self.suma_puntero:]
 
+                    if linea == '':
+                        pass
+
+                        
 
                     if linea == ' \\n':
                         self.linea_actual += 1

@@ -1,5 +1,6 @@
 import re
 import graphviz as gv
+import sys
 
 class N(object):
     def __init__(self, corazon, resto, transicion = None):
@@ -55,11 +56,15 @@ class Yapar(object):
         self.getTokens()
         self.getGrammar()
         self.gramaticaList = self.getGramaticaList()
+
         
         self.simbolosG = self.getSimbolosGramaticales()
         self.arbol = self.getArbol()
 
         self.getTabla()
+
+        self.error_slr = False
+
         
     def checkErrors(self, yalex_rules):
 
@@ -226,7 +231,7 @@ class Yapar(object):
                     string = producciones[i]
 
                 producciones[i] = punto + ' -> ' + '• ' + string
-     
+    
             # Agregar las producciones a J si no estan
             agregados = 0
             for produccion in producciones:
@@ -271,7 +276,13 @@ class Yapar(object):
         if not existe:
             return [], []
         
-        return J, self.cerradura(J)
+        cerradura = []
+        for elemento in J:
+            cerradura_temp = self.cerradura([elemento])
+            for e in cerradura_temp:
+                if e not in cerradura:
+                    cerradura.append(e)
+        return J, cerradura
 
     def getNodo(self, nodos, contenido):
         for nodo in nodos.copy():
@@ -491,7 +502,6 @@ class Yapar(object):
                     conteo += 1
         
         return gramatica_list
-
     
     def getTabla(self):
         C = {}
@@ -535,13 +545,12 @@ class Yapar(object):
 
                     tabla_accion[estado][value] = 's'+ key.estado.replace('I', '')
         
-        
-
         # REDUCIR
         for nodo in self.nodos.copy():
             # Si [A -> α •] está en Ii entonces M[i, a] = “reducir A -> α" para toda a en SIGUIENTE(A)
             if nodo.estado != '':
                 corazon = nodo.corazon
+
                 if type(corazon) != list:
                     corazon = [corazon]
 
@@ -554,27 +563,29 @@ class Yapar(object):
                         siguiente = self.siguiente(izquierda)
                         for simbolo in siguiente:
                             if simbolo != 'ε':
+                                
                                 pass
-
+                            
                             for key, value in self.gramaticaList.items():
                                 
                                 prod_temp = derecha.copy()
                                 prod_temp.remove('•')
-
+                                
                                 if izquierda + ' -> ' + ' '.join(prod_temp) == value:
                                     if simbolo not in tabla_accion[nodo.estado.replace('I', '')]:
                                         tabla_accion[nodo.estado.replace('I', '')][simbolo] = 'r' + str(key)
                                     else:
                                         # si hay un match con r en el espacio es error de reduccion/reduccion
-                                        if simbolo in tabla_accion[nodo.estado.replace('I', '')] and [nodo.estado.replace('I', '')][simbolo][0] == 'r':
+                                        if simbolo in tabla_accion[nodo.estado.replace('I', '')] and tabla_accion[nodo.estado.replace('I', '')][simbolo][0] == 'r':
                                             print('Error: Conflicto en la tabla de analisis. Error reduccion/reduccion')
-
+                                            self.error_slr = True
+                                            sys.exit()
                                         elif simbolo in tabla_accion[nodo.estado.replace('I', '')] and  tabla_accion[nodo.estado.replace('I', '')][simbolo][0] == 's':
                                             print('Error: Conflicto en la tabla de analisis. Error reduccion/desplazamiento')
-                                        exit(0)
-                                    break
+                                            self.error_slr = True
+                                            sys.exit()
+                                    # break
 
-        # self.imprimirTabla(tabla_accion)
         # GOTO
         tabla_goto = {}
         for nodo in self.nodos.copy():

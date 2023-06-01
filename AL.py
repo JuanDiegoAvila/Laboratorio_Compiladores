@@ -34,7 +34,7 @@ class AL(object):
 
     def cantidadLineas(self):
         cantidad_lineas = 0
-        with open('./Yapar/entrada1.txt') as file:
+        with open('./Yapar/entrada3.txt') as file:
             for line in file:
                 cantidad_lineas += 1
         return cantidad_lineas
@@ -54,6 +54,8 @@ class AL(object):
             self.output = []
             self.analizador_lexico()
 
+        # print(self.output)
+
         temp = self.output[0].replace(' ', '')
         print(temp)
         return temp
@@ -66,7 +68,7 @@ class AL(object):
         termino = False
 
 
-        with open('./Yapar/entrada1.txt') as file:
+        with open('./Yapar/entrada3.txt') as file:
             
             for line in file:
             
@@ -79,6 +81,10 @@ class AL(object):
                     # agarrar la linea a partir del puntero 
                     linea = line[self.suma_puntero:]
 
+                    if linea == '':
+                        pass
+
+                        
 
                     if linea == ' \n':
                         self.linea_actual += 1
