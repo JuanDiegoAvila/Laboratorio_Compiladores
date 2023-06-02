@@ -139,8 +139,9 @@ class Simulacion(object):
                         existe = True
 
                     break
-                    
-        
+            
+
+
             if not existe and token not in self.token_keys:
                 posicion = 0
                 for i in range(self.linea):

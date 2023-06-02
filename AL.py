@@ -34,7 +34,7 @@ class AL(object):
 
     def cantidadLineas(self):
         cantidad_lineas = 0
-        with open('./Yapar/entrada3.txt') as file:
+        with open('./Yapar/entrada1.txt') as file:
             for line in file:
                 cantidad_lineas += 1
         return cantidad_lineas
@@ -43,6 +43,12 @@ class AL(object):
     def getNext(self):
         self.next = True
         self.analizador_lexico()
+
+        while self.output == []:
+            print('token no en rules')
+            self.error = True
+            self.analizador_lexico()
+
 
         if 'Error' in self.output[0]:
             print(self.output[0])
@@ -54,10 +60,9 @@ class AL(object):
             self.output = []
             self.analizador_lexico()
 
-        # print(self.output)
+        print(self.output)
 
         temp = self.output[0].replace(' ', '')
-        print(temp)
         return temp
         
 
@@ -68,7 +73,7 @@ class AL(object):
         termino = False
 
 
-        with open('./Yapar/entrada3.txt') as file:
+        with open('./Yapar/entrada1.txt') as file:
             
             for line in file:
             
@@ -83,7 +88,6 @@ class AL(object):
 
                     if linea == '':
                         pass
-
                         
 
                     if linea == ' \n':

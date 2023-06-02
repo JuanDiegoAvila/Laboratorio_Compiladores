@@ -62,7 +62,6 @@ IR_A = YAPAR.tabla_analisis['ir_A']
 
 contador = 0
 
-
 while True:
     S = str(PILA[-1])
     # a = W[0]

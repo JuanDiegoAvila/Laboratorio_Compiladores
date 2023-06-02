@@ -8,7 +8,7 @@ sys.setrecursionlimit(5000)
 
 # Path al archivo YALex
 path = "./Yapar/yal3.txt"
-entrada = "./Yapar/entrada3.txt"
+entrada = "./Yapar/entrada1.txt"
 
 YALEX = Yalex(path)
 automatas = []
@@ -129,6 +129,12 @@ class AL(object):
         self.next = True
         self.analizador_lexico()
 
+        while self.output == []:
+            print('token no en rules')
+            self.error = True
+            self.analizador_lexico()
+
+
         if 'Error' in self.output[0]:
             print(self.output[0])
             self.output = []
@@ -139,10 +145,9 @@ class AL(object):
             self.output = []
             self.analizador_lexico()
 
-        # print(self.output)
+        print(self.output)
 
         temp = self.output[0].replace(' ', '')
-        print(temp)
         return temp
         
 
@@ -168,7 +173,6 @@ class AL(object):
 
                     if linea == '':
                         pass
-
                         
 
                     if linea == ' \\n':
